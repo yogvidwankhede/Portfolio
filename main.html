@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yogvid Wankhede - Data Science Portfolio</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- Font for the game -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom styles for the dark theme and layout */
+        body {
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            /* For Firefox */
+        }
+
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* The main circular HUD element */
+        #pinned-element {
+            width: 55vmin;
+            height: 55vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* The new HUD Frame SVG */
+        #hud-frame {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        /* Styling for the glassmorphism effect */
+        .glass-morphism {
+            background: rgba(40, 40, 40, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Hide the scrollbar but keep functionality */
+        ::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+
+        /* Ensure content canvases & SVGs fit and are layered correctly */
+        #three-canvas,
+        #sci-fi-canvas,
+        .hud-content-svg {
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 15;
+        }
+
+        .hud-content-svg {
+            width: 70%;
+            height: 70%;
+        }
+
+
+        /* Each content section will align text */
+        .content-section {
+            width: 40%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem 5%;
+            margin: 0 5%;
+        }
+
+        /* --- Chatbot Styles --- */
+        #chatbot-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 64px;
+            height: 64px;
+            background: radial-gradient(circle, #4a4a52 0%, #2a2a30 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.5);
+            animation: bobbing 3s infinite ease-in-out;
+            z-index: 1000;
+        }
+
+        @keyframes bobbing {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        #chatbot-toggle .drone-eye {
+            width: 32px;
+            height: 32px;
+            animation: eye-glow 2s infinite alternate ease-in-out;
+        }
+
+        @keyframes eye-glow {
+            from {
+                filter: drop-shadow(0 0 3px #00FFFF);
+                transform: scale(1);
+            }
+
+            to {
+                filter: drop-shadow(0 0 10px #00FFFF);
+                transform: scale(1.05);
+            }
+        }
+
+        .typing-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: rgba(0, 255, 255, 0.5);
+            border-radius: 50%;
+        }
+
+        #chat-window {
+            position: fixed;
+            bottom: 7.5rem;
+            right: 2rem;
+            width: 350px;
+            height: 500px;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 999;
+            transform-origin: bottom right;
+        }
+
+        #chat-window.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        #chat-messages {
+            scrollbar-width: thin;
+            scrollbar-color: #33669966 #2a2a30;
+        }
+
+        #chat-messages::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        #chat-messages::-webkit-scrollbar-track {
+            background: #2a2a30;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb {
+            background-color: #336699;
+            border-radius: 6px;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 0.75rem;
+            border-radius: 1rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .bot-message {
+            background-color: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        .user-message {
+            background-color: #33669966;
+            border: 1px solid #33669966;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        #callout-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: visible;
+            z-index: 30;
+        }
+
+        .skill-label {
+            position: absolute;
+            background: rgba(15, 157, 88, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #f0f0f0;
+            opacity: 0;
+            border: 1px solid rgba(15, 157, 88, 0.4);
+            white-space: nowrap;
+            transform: translate(-50%, -50%);
+        }
+
+        /* --- Custom Scrollbar --- */
+        #custom-scrollbar {
+            position: fixed;
+            right: 15px;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            z-index: 1001;
+            pointer-events: none;
+        }
+
+        #custom-scrollbar-track {
+            position: relative;
+            width: 24px;
+            height: 370px;
+            background-color: #1a1a1a;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+
+        #custom-scrollbar-marks {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: calc(100% - 12px);
+            background-image: repeating-linear-gradient(to bottom,
+                    #555,
+                    #555 2px,
+                    transparent 2px,
+                    transparent 6px);
+        }
+
+        #custom-scrollbar-thumb {
+            position: absolute;
+            width: 6px;
+            height: 25px;
+            background-color: #DB4437;
+            border-radius: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        a.skill-label {
+            pointer-events: auto;
+            text-decoration: none;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+
+        /* --- Drone Game Styles --- */
+        #dino-game-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 998;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            transform: scale(0.6);
+            transform-origin: bottom left;
+            overflow: hidden;
+            width: 450px;
+            height: 150px;
+        }
+
+        #game-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .game-message {
+            display: none !important;
+        }
+
+        /* --- Contact Section --- */
+        #contact {
+            background-color: #00000060;
+        }
+
+        .form-input,
+        .form-textarea {
+            background-color: #2a2a30;
+            border: 1px solid #4a4a52;
+            color: #f0f0f0;
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: #888;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: #F4B400;
+            box-shadow: 0 0 0 2px rgba(244, 180, 0, 0.5);
+            outline: none;
+        }
+
+        .social-icon {
+            background-color: #2a2a30;
+            border: 1px solid #4a4a52;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon svg {
+            color: #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            border-color: #F4B400;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(244, 180, 0, 0.2);
+        }
+
+        .social-icon:hover svg {
+            color: #F4B400;
+        }
+
+        /* --- Light Theme --- */
+        body.light {
+            background-color: #f0f2f5;
+            color: #1a1a1a;
+        }
+
+        body.light .skill-label {
+            color: #1a1a1a;
+            background-color: rgba(15, 157, 88, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-color: rgba(15, 157, 88, 0.3);
+        }
+
+        body.light a.skill-label:hover {
+            background-color: rgba(15, 157, 88, 0.2);
+            border-color: rgba(15, 157, 88, 0.5);
+        }
+
+        body.light #custom-scrollbar-track {
+            background-color: #e9e9ed;
+            border-color: #d1d5db;
+        }
+
+        body.light #custom-scrollbar-marks {
+            background-image: repeating-linear-gradient(to bottom,
+                    #555,
+                    #555 2px,
+                    transparent 2px,
+                    transparent 6px);
+        }
+
+        body.light #custom-scrollbar-thumb {
+            background-color: #DB4437;
+            border-radius: 2px;
+        }
+
+        body.light #custom-scrollbar-thumb:active {
+            background-color: #DB4437;
+        }
+
+        body.light .text-white,
+        body.light h1,
+        body.light h2,
+        body.light h3,
+        body.light h4,
+        body.light h5,
+        body.light h6 {
+            color: #1a1a1a;
+        }
+
+        body.light .text-gray-300,
+        body.light .text-gray-400 {
+            color: #555;
+        }
+
+        body.light #contact {
+            background-color: #ffffffba;
+        }
+
+        body.light .form-input,
+        body.light .form-textarea {
+            background-color: #f0f2f5;
+            border-color: #d1d5db;
+            color: #1a1a1a;
+        }
+
+        body.light .form-input::placeholder,
+        body.light .form-textarea::placeholder {
+            color: #888;
+        }
+
+        body.light .social-icon {
+            background-color: #f0f2f5;
+            border-color: #d1d5db;
+        }
+
+        body.light .social-icon svg {
+            color: #4a4a52;
+        }
+
+        body.light .social-icon:hover {
+            border-color: #F4B400;
+        }
+
+        body.light .social-icon:hover svg {
+            color: #F4B400;
+        }
+
+        body.light #chatbot-toggle,
+        body.light #chat-window {
+            color: #1a1a1a;
+        }
+
+        body.light .glass-morphism {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.light #chat-header,
+        body.light #chat-form {
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light #chat-input {
+            color: #1a1a1a;
+            border-color: #888;
+        }
+
+        body.light .bot-message {
+            background-color: rgba(66, 133, 244, 0.1);
+            border-color: rgba(66, 133, 244, 0.2);
+        }
+
+        body.light .user-message {
+            background-color: rgba(230, 230, 230, 0.8);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+    <canvas id="background-canvas"></canvas>
+
+    <header class="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-wider text-white">Yogvid Wankhede</h1>
+        <nav class="flex items-center space-x-6">
+            <button id="theme-toggle" type="button" class="text-gray-300 hover:text-white transition-colors"
+                aria-label="Toggle theme">
+                <svg id="theme-toggle-dark-icon" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5"
+                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z">
+                    </path>
+                </svg>
+                <svg id="theme-toggle-light-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor"
+                    stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z">
+                    </path>
+                </svg>
+            </button>
+            <a href="https://github.com/yogvidwankhede" target="_blank"
+                class="text-gray-300 hover:text-white transition-colors" aria-label="GitHub">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.378.203 2.398.1 2.651.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.577.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z"
+                        clip-rule="evenodd" />
+                </svg>
+            </a>
+            <a href="https://in.linkedin.com/in/yogvid-wankhede-149103231" target="_blank"
+                class="text-gray-300 hover:text-white transition-colors" aria-label="LinkedIn">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                </svg>
+            </a>
+            <a href="#contact"
+                class="bg-[#336699] text-white px-4 py-2 rounded-full bg-opacity-40 transition text-sm font-medium">Contact</a>
+        </nav>
+    </header>
+
+    <main class="relative z-10">
+        <!-- ✨ Add this block inside <main class="relative z-10">, just BEFORE the current
+             <section id="hero" ...>  -->
+
+        <section id="intro-hero"
+            class="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-20">
+            <!-- Image side -->
+            <div class="md:w-1/2 flex justify-center md:justify-end md:pr-12 mb-10 md:mb-0">
+                <div class="flex justify-center">
+                    <div class="bg-gradient-to-b from-gray-800/60 to-gray-900/80 
+                              p-4 rounded-xl shadow-xl max-w-sm">
+                        <img src="images/yogvid.jpg" alt="Yogvid Wankhede"
+                            class="w-full h-auto rounded-lg border border-gray-700">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Text side -->
+            <div class="md:w-1/2 text-center md:text-left space-y-6">
+                <p class="uppercase tracking-widest text-gray-400 text-sm">
+                    Welcome to my world
+                </p>
+
+                <h1 class="text-4xl md:text-6xl font-bold">
+                    Hi, I’m <span class="text-[#336699]">Yogvid Wankhede</span>
+                </h1>
+
+                <!-- Rotating words -->
+                <div class="relative h-10 mb-4 text-2xl md:text-3xl font-semibold rotate-words">
+                    <span>Data Science Expert.</span>
+                    <span>AI & Machine Learning Engineer.</span>
+                    <span>Problem Solver.</span>
+                </div>
+
+                <p class="text-gray-300 max-w-md mx-auto md:mx-0">
+                    I specialize in extracting meaningful insights from complex datasets and
+                    building intelligent systems. From predictive modeling to deep learning
+                    and NLP, I love applying data-driven solutions to real-world challenges.
+                </p>
+
+                <div class="flex justify-center md:justify-start space-x-4 pt-4">
+                    <a href="#portfolio"
+                        class="bg-[#336699] hover:bg-[#29527a] text-white px-6 py-2 rounded-full transition">
+                        View Portfolio
+                    </a>
+                    <a href="#contact"
+                        class="border border-[#336699] hover:bg-[#336699] hover:text-white px-6 py-2 rounded-full transition">
+                        Contact Me
+                    </a>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Place this small CSS either in the <head> <style> or your CSS file -->
+        <style>
+            /* Rotating words animation */
+            .rotate-words span {
+                position: absolute;
+                opacity: 0;
+                animation: rotate 9s linear infinite 0s;
+            }
+
+            .rotate-words span:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .rotate-words span:nth-child(2) {
+                animation-delay: 3s;
+            }
+
+            .rotate-words span:nth-child(3) {
+                animation-delay: 6s;
+            }
+
+            @keyframes rotate {
+
+                0%,
+                20% {
+                    opacity: 1;
+                }
+
+                33.33%,
+                100% {
+                    opacity: 0;
+                }
+            }
+        </style>
+
+
+        <h2 id="skills-title" class="text-4xl font-bold fixed top-20 left-20 text-white opacity-0 z-20"
+            style="transform: translateX(-30px);">
+            Technical Skills
+        </h2>
+
+        <h2 id="projects-title" class="text-4xl font-bold fixed top-20 left-20 text-white opacity-0 z-20"
+            style="transform: translateX(-30px);">
+            Key Projects
+        </h2>
+
+        <h2 id="certifications-title" class="text-4xl font-bold fixed top-20 left-20 text-white opacity-0 z-20"
+            style="transform: translateX(-30px);">
+            Certifications
+        </h2>
+
+
+        <div id="pinned-container" class="h-[900vh] relative w-full">
+            <div id="pin-wrapper" class="h-screen w-full sticky top-0 left-0 overflow-hidden">
+                <div id="callout-container">
+                    <div id="callout-labels-container"></div>
+                    <svg id="callout-lines-svg"
+                        style="position: absolute; top:0; left:0; width:100%; height:100%;"></svg>
+                </div>
+                <div class="absolute inset-0 flex justify-center items-center">
+                    <div id="pinned-element">
+                    </div>
+                </div>
+                <div id="scroll-content-container" class="absolute inset-0 flex items-center justify-between">
+                </div>
+            </div>
+        </div>
+
+        <section id="contact" class="w-full bg-[#1a1a1a] py-20 px-4 md:px-8">
+            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold">Send a Message</h2>
+                    <form action="#" class="space-y-4">
+                        <div>
+                            <label for="name" class="text-sm font-medium text-gray-400">Name</label>
+                            <input type="text" id="name" name="name" class="form-input w-full mt-1 p-3 rounded-lg"
+                                placeholder="Your Name">
+                        </div>
+                        <div>
+                            <label for="email" class="text-sm font-medium text-gray-400">Email</label>
+                            <input type="email" id="email" name="email" class="form-input w-full mt-1 p-3 rounded-lg"
+                                placeholder="Your Email">
+                        </div>
+                        <div>
+                            <label for="subject" class="text-sm font-medium text-gray-400">Subject</label>
+                            <input type="text" id="subject" name="subject" class="form-input w-full mt-1 p-3 rounded-lg"
+                                placeholder="Subject">
+                        </div>
+                        <div>
+                            <label for="message" class="text-sm font-medium text-gray-400">Message</label>
+                            <textarea id="message" name="message" rows="4"
+                                class="form-textarea w-full mt-1 p-3 rounded-lg" placeholder="Your Message"></textarea>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-[#336699] text-white font-bold py-3 px-6 rounded-lg bg-opacity-40 transition-all">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+                <div class="space-y-8">
+                    <h2 class="text-3xl font-bold">Get In Touch</h2>
+                    <p class="text-gray-400">
+                        Feel free to contact me for any work or suggestions. I'm always open to discussing new projects,
+                        creative ideas, or opportunities to be part of your vision.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="social-icon p-3 rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Email</h3>
+                                <p class="text-gray-400">yogvidwankhede@gmail.com</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="social-icon p-3 rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">Location</h3>
+                                <p class="text-gray-400">Nagpur, India</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-4">Connect with me</h3>
+                        <div class="flex space-x-4">
+                            <a href="https://github.com/yogvidwankhede" target="_blank"
+                                class="social-icon p-3 rounded-lg inline-block">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd"
+                                        d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.378.203 2.398.1 2.651.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.577.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                            <a href="https://in.linkedin.com/in/yogvid-wankhede-149103231" target="_blank"
+                                class="social-icon p-3 rounded-lg inline-block">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <footer class="w-full text-center p-8 bg-black text-gray-500 text-sm">
+            <p>&copy; 2025 Yogvid Wankhede. All Rights Reserved.</p>
+        </footer>
+    </main>
+
+    <!-- Custom Scrollbar Element -->
+    <div id="custom-scrollbar">
+        <div id="custom-scrollbar-track">
+            <div id="custom-scrollbar-marks"></div>
+            <div id="custom-scrollbar-thumb"></div>
+        </div>
+    </div>
+
+    <!-- Drone Game Element -->
+    <div id="dino-game-container">
+        <canvas id="game-canvas" width="450" height="150" tabindex="0"></canvas>
+        <div id="start-message" class="game-message"></div>
+        <div id="game-over-message" class="game-message"></div>
+    </div>
+
+    <div id="chatbot-toggle">
+        <svg class="drone-eye" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <radialGradient id="eyeGradient">
+                    <stop offset="0%" stop-color="#80FFFF" />
+                    <stop offset="100%" stop-color="#00FFFF" />
+                </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill="none" stroke="url(#eyeGradient)" stroke-width="4" />
+            <circle cx="50" cy="50" r="25" fill="url(#eyeGradient)" />
+            <circle cx="50" cy="50" r="10" fill="#1a1a1a" />
+        </svg>
+    </div>
+
+    <div id="chat-window" class="hidden glass-morphism flex flex-col">
+        <div id="chat-header" class="flex justify-between items-center p-4 border-b border-[#336699]/40">
+            <h3 class="font-bold text-lg text-white">Portfolio Assistant</h3>
+            <button id="close-chat" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+        </div>
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col space-y-2">
+        </div>
+        <form id="chat-form" class="p-4 border-t border-[#336699]/40 flex items-center">
+            <input id="chat-input" type="text" placeholder="Ask about my projects..."
+                class="flex-1 bg-transparent border border-[#336699] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#336699] text-white">
+            <button type="submit"
+                class="ml-3 p-3 rounded-full bg-[#336699] text-white bg-opacity-40 transition-all transform hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-send-fill" viewBox="0 0 16 16">
+                    <path
+                        d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z" />
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. SETUP ---
+            const pinnedElement = document.getElementById('pinned-element');
+            const scrollContentContainer = document.getElementById('scroll-content-container');
+            const backgroundCanvas = document.getElementById('background-canvas');
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+            const bodyEl = document.body;
+
+
+            // Theme switcher logic
+            if (localStorage.getItem('color-theme') === 'light' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+                lightIcon.classList.remove('hidden');
+                darkIcon.classList.add('hidden');
+                bodyEl.classList.add('light');
+            } else {
+                lightIcon.classList.add('hidden');
+                darkIcon.classList.remove('hidden');
+                bodyEl.classList.remove('light');
+            }
+
+            themeToggleBtn.addEventListener('click', function () {
+                darkIcon.classList.toggle('hidden');
+                lightIcon.classList.toggle('hidden');
+
+                if (localStorage.getItem('color-theme')) {
+                    if (localStorage.getItem('color-theme') === 'light') {
+                        bodyEl.classList.remove('light');
+                        localStorage.setItem('color-theme', 'dark');
+                    } else {
+                        bodyEl.classList.add('light');
+                        localStorage.setItem('color-theme', 'light');
+                    }
+                } else {
+                    if (bodyEl.classList.contains('light')) {
+                        bodyEl.classList.remove('light');
+                        localStorage.setItem('color-theme', 'dark');
+                    } else {
+                        bodyEl.classList.add('light');
+                        localStorage.setItem('color-theme', 'light');
+                    }
+                }
+
+                // Update line colors based on the new theme
+                const allLines = document.querySelectorAll('#callout-lines-svg path');
+                const newLineColor = bodyEl.classList.contains('light') ? 'rgba(26, 26, 26, 0.4)' : 'rgba(255, 255, 255, 0.4)';
+                gsap.to(allLines, { attr: { stroke: newLineColor }, duration: 0.3 });
+            });
+
+
+            let threeScene, camera, renderer, lensGroup;
+            const numDots = 5;
+
+            // --- 2. ASSETS & CONTENT ---
+            const scrollContent = [
+                { title: "", description: "", align: 'right' },
+                { title: "", description: "", align: 'left' },
+                { title: "", description: "", align: 'right' },
+                { title: "", description: "", align: 'left' },
+                { title: "", description: "", align: 'right' },
+                { title: "", description: "", align: 'left' },
+                { title: "", description: "", align: 'right' }
+            ];
+
+            const svgs = {
+                hudFrame: `<svg id="hud-frame" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="glossy" cx="50%" cy="0%" r="100%" fx="50%" fy="0%"><stop offset="0%" style="stop-color:rgba(255, 255, 255, 0.4)" /><stop offset="100%" style="stop-color:rgba(255, 255, 255, 0)" /></radialGradient></defs><circle cx="100" cy="100" r="95" fill="none" stroke="#2a2a30" stroke-width="6"/><g id="tick-marks" stroke="#888" stroke-width="1" stroke-linecap="round">${[...Array(120)].map((_, i) => `<path d="M100 ${i % 5 === 0 ? 10 : 12} L100 18" transform="rotate(${i * 3}, 100, 100)"/>`).join('')}</g><g fill="none" stroke-width="4" stroke-linecap="round"><path id="arc-1" d="M 190 100 A 90 90 0 0 1 100 190" stroke="#0F9D58"/><path id="arc-2" d="M 100 190 A 90 90 0 0 1 10 100" stroke="#3367C0"/><path id="arc-3" d="M 10 100 A 90 90 0 0 1 100 10" stroke="#A33229"/><path id="arc-4" d="M 100 10 A 90 90 0 0 1 190 100" stroke="#F4B400"/></g><circle cx="100" cy="100" r="98" fill="url(#glossy)" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/></svg>`,
+                staggerDots: `<svg id="svg-stagger-dots" class="hud-content-svg" viewBox="0 0 100 100"></svg>`,
+                clockwork: `<svg id="svg-clockwork" class="hud-content-svg" viewBox="0 0 100 100"><g id="clock-ticks">${[...Array(60)].map((_, i) => `<path d="M50 ${i % 5 === 0 ? 5 : 8} L50 12" stroke-width="${i % 5 === 0 ? '1.5' : '0.5'}" stroke="#f0f0f0" transform="rotate(${i * 6}, 50, 50)" />`).join('')}</g><path id="clock-hand" d="M50 50 L50 15" stroke="#F4B400" stroke-width="2" stroke-linecap="round" /></svg>`,
+                springs: `<svg id="svg-springs" class="hud-content-svg" viewBox="0 0 100 100"></svg>`,
+                finalPattern: `<svg id="svg-final-pattern" class="hud-content-svg" viewBox="0 0 100 100"></svg>`,
+            };
+
+            const calloutData = {
+                allSkills: {
+                    labels: [
+                        "Python", "TensorFlow", "Tableau", "Power BI", "MySQL",
+                        "NumPy", "Pandas", "Scikit-learn", "OpenCV", "NLTK",
+                        "Data Modeling", "Machine Learning", "NLP"
+                    ],
+                    positions: [
+                        { x: '75%', y: '15%' }, // top-right
+                        { x: '90%', y: '30%' }, // upper-mid-right
+                        { x: '60%', y: '25%' }, // upper-mid (not center, not too left)
+                        { x: '85%', y: '45%' }, // right-mid
+                        { x: '70%', y: '40%' }, // mid-upper-right
+                        { x: '15%', y: '55%' }, // left-mid (not top-left, not far edge)
+                        { x: '25%', y: '70%' }, // bottom-left quadrant
+                        { x: '40%', y: '85%' }, // bottom-left-mid
+                        { x: '65%', y: '75%' }, // lower-mid-right
+                        { x: '80%', y: '65%' }, // lower-right
+                        { x: '55%', y: '90%' }, // bottom-mid
+                        { x: '90%', y: '80%' }, // bottom-right
+                        { x: '35%', y: '60%' }  // lower-left-mid
+                    ]
+
+                },
+                projects: {
+                    labels: [
+                        "Real-Time Sign Language Interpreter",
+                        "Educational Resource Management",
+                        "Hospital Data Analysis",
+                        "Fake News Detection",
+                        "Image Captioning System"
+                    ],
+                    urls: [
+                        "https://github.com/yogvidwankhede/Sign_Language_Interpreter", // Replace with your project link
+                        "https://github.com/yogvidwankhede/Educational-Resource-Management", // Replace with your project link
+                        "https://github.com/yogvidwankhede/EDA", // Replace with your project link
+                        "https://github.com/yogvidwankhede/Fake_News_Detection", // Replace with your project link
+                        "#"  // Replace with your project link
+                    ],
+                    positions: [
+                        { x: '75%', y: '20%' }, // top-right
+                        { x: '85%', y: '40%' }, // upper-mid-right
+                        { x: '65%', y: '55%' }, // mid-lower
+                        { x: '25%', y: '70%' }, // bottom-left-mid
+                        { x: '80%', y: '85%' }  // bottom-right
+                    ]
+
+                },
+                certifications: {
+                    labels: [
+                        "Google Advanced Data Analytics Professional",
+                        "DeepLearning.AI TensorFlow Developer",
+                        "Python 3 Programming",
+                        "Microsoft 365 Fundamentals"
+                    ],
+                    urls: [
+                        "https://www.coursera.org/account/accomplishments/professional-cert/2F66GDKEUNLK", // Replace with your certification link
+                        "https://www.coursera.org/account/accomplishments/professional-cert/PAUSSXCRK9YL", // Replace with your certification link
+                        "https://drive.google.com/file/d/169OETqm19aT5-wTkfsaMtckLV9ipf5w4/view?usp=sharing", // Replace with your certification link
+                        "https://www.coursera.org/account/accomplishments/specialization/2EUL5E7W7JNU"  // Replace with your certification link
+                    ],
+                    positions: [
+                        { x: '78%', y: '25%' }, // top-right
+                        { x: '86%', y: '45%' }, // mid-upper-right
+                        { x: '74%', y: '60%' }, // mid-lower (pulled a bit left for balance)
+                        { x: '82%', y: '78%' }  // bottom-right
+                    ]
+
+                }
+            };
+
+            // --- 3. DYNAMIC CONTENT INJECTION ---
+            let contentHTML = '';
+            scrollContent.forEach(content => {
+                const alignClass = content.align === 'left' ? 'justify-start' : 'justify-end';
+                contentHTML += `<div class="content-section absolute inset-0 flex ${alignClass} items-center opacity-0"><div class="max-w-md"><h2 class="text-4xl font-bold">${content.title}</h2><p class="mt-4 text-gray-300">${content.description}</p></div></div>`;
+            });
+            scrollContentContainer.innerHTML = contentHTML;
+            const contentSections = document.querySelectorAll('.content-section');
+
+            // --- 4. THREE.JS, CANVAS & ANIMATION SETUP ---
+            let sciFiAnimation, backgroundAnimation;
+
+            function createPlexusAnimation(canvas, particleCount, maxDist, color) {
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+                let animationId;
+                const mouse = {
+                    x: undefined,
+                    y: undefined,
+                    radius: 150 // Interaction radius
+                };
+
+                let mouseMoveListener, mouseOutListener;
+
+                function hexToRgb(hex) {
+                    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                    return result ? {
+                        r: parseInt(result[1], 16),
+                        g: parseInt(result[2], 16),
+                        b: parseInt(result[3], 16)
+                    } : null;
+                }
+
+                const rgbColor = hexToRgb(color);
+
+                function resizeCanvas() {
+                    if (canvas.id === 'sci-fi-canvas') {
+                        const size = pinnedElement.clientWidth * 0.8;
+                        canvas.width = size;
+                        canvas.height = size;
+                    } else {
+                        canvas.width = window.innerWidth;
+                        canvas.height = window.innerHeight;
+                    }
+                }
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+
+                // Add mouse listeners
+                mouseMoveListener = (event) => {
+                    const rect = canvas.getBoundingClientRect();
+                    mouse.x = event.clientX - rect.left;
+                    mouse.y = event.clientY - rect.top;
+                };
+                mouseOutListener = () => {
+                    mouse.x = undefined;
+                    mouse.y = undefined;
+                };
+                window.addEventListener('mousemove', mouseMoveListener);
+                window.addEventListener('mouseout', mouseOutListener);
+
+                class Particle {
+                    constructor() {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.baseX = this.x;
+                        this.baseY = this.y;
+                        this.vx = Math.random() * 0.4 - 0.2;
+                        this.vy = Math.random() * 0.4 - 0.2;
+                        this.radius = 1.8;
+                        this.density = (Math.random() * 20) + 5; // How much it reacts to the mouse
+                    }
+                    update() {
+                        // Mouse interaction logic
+                        if (mouse.x !== undefined && mouse.y !== undefined) {
+                            let dx = mouse.x - this.x;
+                            let dy = mouse.y - this.y;
+                            let distance = Math.sqrt(dx * dx + dy * dy);
+                            if (distance < mouse.radius) {
+                                const forceDirectionX = dx / distance;
+                                const forceDirectionY = dy / distance;
+                                const force = (mouse.radius - distance) / mouse.radius;
+                                const directionX = forceDirectionX * force * this.density;
+                                const directionY = forceDirectionY * force * this.density;
+                                this.x -= directionX;
+                                this.y -= directionY;
+                            }
+                        }
+
+                        // Original boundary and velocity logic
+                        this.x += this.vx;
+                        this.y += this.vy;
+                        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                    }
+                    draw() {
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = color;
+                        ctx.fill();
+                    }
+                }
+                for (let i = 0; i < particleCount; i++) { particles.push(new Particle()); }
+
+                function connectParticles() {
+                    for (let i = 0; i < particles.length; i++) {
+                        for (let j = i; j < particles.length; j++) {
+                            const dx = particles[i].x - particles[j].x;
+                            const dy = particles[i].y - particles[j].y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+
+                            if (dist < maxDist && rgbColor) {
+                                ctx.beginPath();
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.strokeStyle = `rgba(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b}, ${1 - dist / maxDist})`;
+                                ctx.lineWidth = 0.6;
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                }
+
+                function animate() {
+                    if (!ctx) return;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles.forEach(p => { p.update(); p.draw(); });
+                    connectParticles();
+                    animationId = requestAnimationFrame(animate);
+                }
+                animate();
+
+                return {
+                    stop: () => {
+                        cancelAnimationFrame(animationId);
+                        window.removeEventListener('mousemove', mouseMoveListener);
+                        window.removeEventListener('mouseout', mouseOutListener);
+                    },
+                    start: animate,
+                    canvas: canvas
+                };
+            }
+
+
+            function initThree() {
+                threeScene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+                camera.position.z = 5;
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(pinnedElement.clientWidth * 0.8, pinnedElement.clientHeight * 0.8);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                const canvas = renderer.domElement;
+                canvas.id = 'three-canvas';
+                gsap.set(canvas, { opacity: 0 }); // Start hidden
+                pinnedElement.appendChild(canvas);
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                threeScene.add(ambientLight);
+                const pointLight = new THREE.PointLight(0xffffff, 1);
+                pointLight.position.set(5, 5, 5);
+                threeScene.add(pointLight);
+                lensGroup = new THREE.Group();
+                const material = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.4, metalness: 0.8 });
+                const mainTube = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 2.5, 32), material);
+                mainTube.rotation.x = Math.PI / 2;
+                const objective = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 0.5, 32), material);
+                objective.rotation.x = Math.PI / 2;
+                objective.position.z = 1.5;
+                const eyepiece = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.8, 32), material);
+                eyepiece.rotation.x = Math.PI / 2;
+                eyepiece.position.z = -1.3;
+                lensGroup.add(mainTube, objective, eyepiece);
+                lensGroup.rotation.set(0, Math.PI / 6, -Math.PI / 8);
+                threeScene.add(lensGroup);
+                function animate() {
+                    requestAnimationFrame(animate);
+                    renderer.render(threeScene, camera);
+                }
+                animate();
+            }
+
+            function setupPinnedElements() {
+                const sciFiCanvas = document.createElement('canvas');
+                sciFiCanvas.id = 'sci-fi-canvas';
+
+                pinnedElement.innerHTML = svgs.hudFrame;
+                pinnedElement.appendChild(sciFiCanvas);
+                pinnedElement.insertAdjacentHTML('beforeend', svgs.staggerDots + svgs.clockwork + svgs.springs + svgs.finalPattern);
+
+                initThree();
+                sciFiAnimation = createPlexusAnimation(sciFiCanvas, 80, 100, '#336699');
+
+                const children = gsap.utils.toArray(pinnedElement.children).filter(el => el.id !== 'hud-frame' && el.id !== 'sci-fi-canvas');
+                gsap.set(children, { opacity: 0 });
+
+                const setupDotGrid = (svgId, color) => {
+                    const svg = document.getElementById(svgId);
+                    if (!svg) return;
+                    const gridSize = 13;
+                    for (let i = 0; i < gridSize; i++) {
+                        for (let j = 0; j < gridSize; j++) {
+                            const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                            const dist = Math.sqrt(Math.pow(i - (gridSize - 1) / 2, 2) + Math.pow(j - (gridSize - 1) / 2, 2));
+                            if (dist < gridSize / 2) {
+                                gsap.set(el, { attr: { cx: 15 + i * 6, cy: 15 + j * 6, r: 2.5 }, fill: color });
+                                svg.appendChild(el);
+                            }
+                        }
+                    }
+                };
+
+                setupDotGrid('svg-stagger-dots', '#DB4437');
+                setupDotGrid('svg-final-pattern', '#996633');
+
+                const springsSVG = document.getElementById('svg-springs');
+                for (let i = 0; i < numDots; i++) {
+                    const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    gsap.set(el, { attr: { cx: 50, cy: 50, r: 5 }, fill: '#336699' });
+                    springsSVG.appendChild(el);
+                }
+            }
+
+            const createCalloutElements = (data) => {
+                const labelsContainer = document.getElementById('callout-labels-container');
+                const linesSVG = document.getElementById('callout-lines-svg');
+                const group = { labels: [], lines: [] };
+
+                data.labels.forEach((text, i) => {
+                    const hasUrl = data.urls && data.urls[i];
+                    const wrapper = hasUrl ? document.createElement('a') : document.createElement('div');
+
+                    if (hasUrl) {
+                        wrapper.href = data.urls[i];
+                        wrapper.target = '_blank';
+                        wrapper.rel = 'noopener noreferrer';
+                        wrapper.style.cursor = 'pointer';
+                        wrapper.addEventListener('mouseenter', () => gsap.to(wrapper, { backgroundColor: 'rgba(15, 157, 88, 0.4)', borderColor: 'rgba(15, 157, 88, 0.7)', duration: 0.2 }));
+                        wrapper.addEventListener('mouseleave', () => gsap.to(wrapper, { backgroundColor: 'rgba(15, 157, 88, 0.2)', borderColor: 'rgba(15, 157, 88, 0.4)', duration: 0.2 }));
+                    }
+
+                    wrapper.className = 'skill-label';
+                    wrapper.textContent = text;
+                    gsap.set(wrapper, { top: data.positions[i].y, left: data.positions[i].x });
+                    labelsContainer.appendChild(wrapper);
+                    group.labels.push(wrapper);
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+                    const updatePath = () => {
+                        const center = pinnedElement.getBoundingClientRect();
+                        const labelEl = wrapper.getBoundingClientRect();
+                        const svgRect = linesSVG.getBoundingClientRect();
+
+                        const sx = center.left + center.width / 2 - svgRect.left;
+                        const sy = center.top + center.height / 2 - svgRect.top;
+
+                        const ex = labelEl.left + (parseFloat(data.positions[i].x) < 50 ? labelEl.width : 0) - svgRect.left;
+                        const ey = labelEl.top + labelEl.height / 2 - svgRect.top;
+
+                        const d = `M ${sx} ${sy} L ${ex} ${ey}`;
+                        gsap.set(line, { attr: { d } });
+                        line.style.strokeDasharray = line.getTotalLength();
+                        line.style.strokeDashoffset = line.getTotalLength();
+                    }
+
+                    setTimeout(updatePath, 100);
+                    window.addEventListener('resize', updatePath);
+
+                    const initialLineColor = document.body.classList.contains('light')
+                        ? 'rgba(26, 26, 26, 0.4)' // Black for light theme
+                        : 'rgba(255, 255, 255, 0.4)'; // White for dark theme
+                    gsap.set(line, { attr: { 'stroke-width': 0.5, stroke: initialLineColor } });
+                    linesSVG.appendChild(line);
+                    group.lines.push(line);
+                });
+                return group;
+            };
+
+            // --- 5. GSAP SCROLL-DRIVEN ANIMATION ---
+            gsap.registerPlugin(ScrollTrigger, Draggable, ScrollToPlugin);
+            setupPinnedElements();
+
+            const allSkillsCallouts = createCalloutElements(calloutData.allSkills);
+            const projectCallouts = createCalloutElements(calloutData.projects);
+            const certificationCallouts = createCalloutElements(calloutData.certifications);
+
+            gsap.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'hidden' });
+            gsap.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'hidden' });
+            gsap.set(certificationCallouts.labels.concat(certificationCallouts.lines), { visibility: 'hidden' });
+
+
+            const sciFiCanvas = document.getElementById('sci-fi-canvas');
+            const threeCanvas = document.getElementById('three-canvas');
+            const svgStaggerDots = document.getElementById('svg-stagger-dots');
+            const svgClockwork = document.getElementById('svg-clockwork');
+            const svgClockHand = document.getElementById('clock-hand');
+            const svgSprings = document.getElementById('svg-springs');
+            const svgSpringDots = gsap.utils.toArray('#svg-springs circle');
+            const svgFinalPattern = document.getElementById('svg-final-pattern');
+            const colorArcs = gsap.utils.toArray("#arc-1, #arc-2, #arc-3, #arc-4");
+            const skillsTitle = document.getElementById('skills-title');
+            const projectsTitle = document.getElementById('projects-title');
+            const certificationsTitle = document.getElementById('certifications-title');
+
+            colorArcs.forEach(arc => {
+                const len = arc.getTotalLength();
+                arc.style.strokeDasharray = len;
+                arc.style.strokeDashoffset = len;
+            });
+
+            gsap.set(contentSections[0], { opacity: 1 });
+
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#pinned-container",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 1,
+                    onEnter: () => {
+                        sciFiAnimation.stop();
+                        backgroundAnimation = createPlexusAnimation(backgroundCanvas, 200, 120, '#336699');
+                    },
+                    onLeaveBack: () => {
+                        if (backgroundAnimation) {
+                            backgroundAnimation.stop();
+                            const ctx = backgroundCanvas.getContext('2d');
+                            ctx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+                        }
+                        sciFiAnimation = createPlexusAnimation(document.getElementById('sci-fi-canvas'), 80, 100, '#336699');
+                    },
+                },
+            });
+
+            const sectionDuration = 1 / (contentSections.length - 1);
+            const p = (index) => index * sectionDuration;
+
+            contentSections.forEach((section, index) => {
+                tl.to(section, { opacity: 1, duration: p(0.1) }, p(index));
+                if (index < contentSections.length - 1) {
+                    tl.to(section, { opacity: 0, duration: p(0.1) }, p(index + 0.9));
+                }
+            });
+
+            // --- TIMELINE DEFINITIONS ---
+            tl.to(colorArcs, { strokeDashoffset: 0, duration: p(5), stagger: p(0.5) }, 0);
+
+            const circleSize = (pinnedElement.getBoundingClientRect().width / window.innerWidth) * 50;
+            tl.to(sciFiCanvas, { opacity: 0, duration: p(0.2) }, p(0))
+                .fromTo(backgroundCanvas,
+                    { clipPath: `circle(${circleSize}vw at 50% 50%)`, opacity: 1 },
+                    { clipPath: `circle(100vw at 50% 50%)`, duration: p(1), ease: 'power2.inOut' },
+                    p(0)
+                );
+
+            tl.to(threeCanvas, { opacity: 1, duration: p(0.1) }, p(0.5));
+
+            tl.to(lensGroup.children[1].position, { z: 2.2, duration: p(1) }, p(1))
+                .to(lensGroup.children[2].position, { z: -2.0, duration: p(1) }, p(1))
+                .to(lensGroup.rotation, { x: Math.PI / 8, y: Math.PI / 2, duration: p(1) }, p(1));
+
+            const skillsStartTime = p(1);
+            const skillsEndTime = p(2);
+            tl.to(skillsTitle, { opacity: 1, x: 0, duration: p(0.5) }, skillsStartTime);
+            tl.to(skillsTitle, { opacity: 0, x: -30, duration: p(0.5) }, skillsEndTime);
+            tl.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'visible' }, skillsStartTime);
+            tl.to(allSkillsCallouts.lines, { strokeDashoffset: 0, duration: p(1) }, skillsStartTime);
+            tl.to(allSkillsCallouts.labels, { opacity: 1, duration: p(1) }, skillsStartTime);
+            tl.to(allSkillsCallouts.labels, { opacity: 0, duration: p(0.5) }, skillsEndTime);
+            tl.to(allSkillsCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, skillsEndTime);
+            tl.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'hidden' }, skillsEndTime + p(0.5));
+
+            // --- Projects Callout Animation ---
+            const projectsStartTime = p(2);
+            const projectsEndTime = p(5);
+            tl.to(projectsTitle, { opacity: 1, x: 0, duration: p(0.5) }, projectsStartTime);
+            tl.to(projectsTitle, { opacity: 0, x: -30, duration: p(0.5) }, projectsEndTime);
+            tl.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'visible' }, projectsStartTime);
+            tl.to(projectCallouts.lines, { strokeDashoffset: 0, duration: p(1), stagger: 0.1 }, projectsStartTime);
+            tl.to(projectCallouts.labels, { opacity: 1, duration: p(1), stagger: 0.1 }, projectsStartTime);
+            tl.to(projectCallouts.labels, { opacity: 0, duration: p(0.5) }, projectsEndTime);
+            tl.to(projectCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, projectsEndTime);
+            tl.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'hidden' }, projectsEndTime + p(0.5));
+
+            // --- Certifications Callout Animation ---
+            const certsStartTime = p(5.1);
+            const certsEndTime = p(7.5);
+            tl.to(certificationsTitle, { opacity: 1, x: 0, duration: p(0.5) }, certsStartTime);
+            tl.to(certificationsTitle, { opacity: 0, x: -30, duration: p(0.5) }, certsEndTime);
+            tl.set(certificationCallouts.labels.concat(certificationCallouts.lines), { visibility: 'visible' }, certsStartTime);
+            tl.to(certificationCallouts.lines, { strokeDashoffset: 0, duration: p(1), stagger: 0.1 }, certsStartTime);
+            tl.to(certificationCallouts.labels, { opacity: 1, duration: p(1), stagger: 0.1 }, certsStartTime);
+            tl.to(certificationCallouts.labels, { opacity: 0, duration: p(0.5) }, certsEndTime);
+            tl.to(certificationCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, certsEndTime);
+            tl.set(certificationCallouts.labels.concat(certificationCallouts.lines), { visibility: 'hidden' }, certsEndTime + p(0.5));
+
+
+            tl.to(threeCanvas, { opacity: 0, duration: p(0.1) }, p(4))
+                .to(svgStaggerDots, { opacity: 1, duration: p(0.1) }, p(4))
+                .from(gsap.utils.toArray('#svg-stagger-dots circle'), { scale: 0.1, stagger: { grid: 'auto', from: 'center', amount: p(0.8) }, duration: p(1), }, p(4));
+
+            tl.to(svgStaggerDots, { opacity: 0, duration: p(0.1) }, p(5))
+                .to(svgClockwork, { opacity: 1, duration: p(0.1) }, p(5))
+                .to(svgClockHand, { rotation: 1080, transformOrigin: '50% 50%', duration: p(1) }, p(5));
+
+            tl.to(svgClockwork, { opacity: 0, duration: p(0.1) }, p(6))
+                .to(svgSprings, { opacity: 1, duration: p(0.1) }, p(6))
+                .to(svgSpringDots, { attr: { cx: (i) => 50 + 40 * Math.cos(i * (2 * Math.PI / numDots)), cy: (i) => 50 + 40 * Math.sin(i * (2 * Math.PI / numDots)), }, stagger: 0.05, duration: p(1), ease: 'elastic.out(1, 0.5)' }, p(6));
+
+            tl.to(svgSprings, { opacity: 0, duration: p(0.1) }, p(7))
+                .to(svgFinalPattern, { opacity: 1, duration: p(0.1) }, p(7))
+                .from(gsap.utils.toArray('#svg-final-pattern circle'), { scale: 0, stagger: { grid: 'auto', from: 'center', amount: p(0.8) }, duration: p(1), }, p(7));
+
+            // --- Custom Scrollbar Logic ---
+            const thumb = document.getElementById('custom-scrollbar-thumb');
+            const track = document.getElementById('custom-scrollbar-track');
+
+            gsap.to(thumb, {
+                y: () => track.clientHeight - thumb.clientHeight,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: document.body,
+                    start: 'top top',
+                    end: 'bottom bottom',
+                    scrub: true
+                }
+            });
+
+            Draggable.create(thumb, {
+                type: 'y',
+                bounds: track,
+                inertia: true,
+                onDrag: function () {
+                    const progress = this.y / (track.clientHeight - this.clientHeight);
+                    gsap.to(window, {
+                        scrollTo: {
+                            y: progress * (document.body.scrollHeight - window.innerHeight),
+                            autoKill: false
+                        },
+                        ease: 'none',
+                        overwrite: true
+                    });
+                }
+            });
+
+            // --- Chatbot Logic ---
+            const chatbotToggle = document.getElementById('chatbot-toggle');
+            const chatWindow = document.getElementById('chat-window');
+            const closeChat = document.getElementById('close-chat');
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+
+            const toggleChat = (forceOpen = null) => {
+                const isOpen = chatWindow.classList.contains('open');
+                if (forceOpen === true || (!isOpen && forceOpen === null)) {
+                    chatWindow.classList.remove('hidden');
+                    setTimeout(() => chatWindow.classList.add('open'), 10);
+                } else if (forceOpen === false || (isOpen && forceOpen === null)) {
+                    chatWindow.classList.remove('open');
+                    chatWindow.addEventListener('transitionend', () => {
+                        chatWindow.classList.add('hidden');
+                    }, { once: true });
+                }
+            };
+
+            chatbotToggle.addEventListener('click', () => toggleChat());
+            closeChat.addEventListener('click', () => toggleChat(false));
+
+            const addMessage = (message, sender, messageId = null) => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-message');
+                if (sender === 'bot-typing') {
+                    messageElement.classList.add('bot-message');
+                    messageElement.innerHTML = `<div class="flex items-center space-x-1">${message}</div>`;
+                } else {
+                    messageElement.classList.add(`${sender}-message`);
+                    messageElement.textContent = message;
+                }
+
+                if (messageId) {
+                    messageElement.id = messageId;
+                }
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            };
+
+            const addTypingIndicator = () => {
+                const typingIndicatorId = `typing-${Date.now()}`;
+                const indicatorHTML = `<span class="typing-dot animate-bounce"></span><span class="typing-dot animate-bounce" style="animation-delay: 0.2s"></span><span class="typing-dot animate-bounce" style="animation-delay: 0.4s"></span>`;
+                addMessage(indicatorHTML, 'bot-typing', typingIndicatorId);
+                return typingIndicatorId;
+            };
+
+            const getGeminiResponse = async (userInput) => {
+                const apiKey = "AIzaSyBV1BbY0zc4zWvx-iXj4MSLWQeRpud3lhM"; // IMPORTANT: Left blank intentionally. Canvas will provide one.
+                if (!apiKey) {
+                    return "I'm sorry, but my connection isn't configured. The developer needs to add an API key.";
+                }
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+                const systemPrompt = "You are a helpful and friendly AI assistant for Yogvid Wankhede's data science portfolio. Your personality is professional, yet approachable and enthusiastic about technology. You are an expert on Yogvid's skills, which include Python, Data Analysis, Machine Learning, TensorFlow, Tableau, and Power BI. You should answer questions about his work, the projects shown on this site (like the Image Captioning System and Sign Language Interpreter), and his technical abilities. Keep your answers concise and encourage users to reach out to Yogvid for collaboration via his LinkedIn.";
+
+                const payload = {
+                    contents: [{ parts: [{ text: userInput }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        console.error("API Error Response:", await response.text());
+                        return "My apologies, but my connection to the central matrix seems to be unstable. Please try again shortly.";
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        return candidate.content.parts[0].text;
+                    } else {
+                        console.error("Unexpected API response structure:", result);
+                        return "I've encountered a paradox in my logic circuits. Please ask something else.";
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    return "There's a cosmic interference in my communication channels. I am unable to respond at this moment.";
+                }
+            };
+
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const userMessage = chatInput.value.trim();
+                if (userMessage) {
+                    addMessage(userMessage, 'user');
+                    chatInput.value = '';
+                    chatInput.disabled = true;
+
+                    const typingIndicatorId = addTypingIndicator();
+                    const botMessage = await getGeminiResponse(userMessage);
+
+                    const typingIndicator = document.getElementById(typingIndicatorId);
+                    if (typingIndicator) {
+                        chatMessages.removeChild(typingIndicator);
+                    }
+
+                    addMessage(botMessage, 'bot');
+                    chatInput.disabled = false;
+                    chatInput.focus();
+                }
+            });
+
+            setTimeout(() => {
+                addMessage("Hello! I’m your Portfolio Assistant — here to provide insights about my skills, projects, and professional experience. Ask me anything to explore my work.", 'bot');
+            }, 2000);
+
+        });
+    </script>
+
+    <!-- Drone Game Script -->
+    <script>
+        // Game implementation
+        const gameCanvas = document.getElementById('game-canvas');
+        const gameCtx = gameCanvas.getContext('2d');
+
+        const DRONE_WIDTH = 38;
+        const DRONE_HEIGHT = 20;
+        const GROUND_Y = gameCanvas.height - 20;
+
+        let score = 0;
+        let highScore = 0;
+        let gameSpeed = 5;
+        let isPlaying = false;
+        let isGameOver = true; // Start in a "game over" state
+        let gameAnimationFrameId;
+
+        class Drone {
+            constructor() {
+                this.x = 50;
+                this.y = GROUND_Y - DRONE_HEIGHT;
+                this.width = DRONE_WIDTH;
+                this.height = DRONE_HEIGHT;
+                this.velocityY = 0;
+                this.isAscending = false;
+                this.ascendPower = -10;
+                this.gravity = 0.4;
+            }
+
+            draw() {
+                const droneColor = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
+                gameCtx.fillStyle = droneColor;
+                // Main body
+                gameCtx.fillRect(this.x, this.y + 5, this.width, this.height - 10);
+                // Propellers
+                gameCtx.fillRect(this.x + 2, this.y, 10, 5);
+                gameCtx.fillRect(this.x + this.width - 12, this.y, 10, 5);
+                // "Eye" or sensor - using portfolio accent color
+                gameCtx.fillStyle = '#F4B400';
+                gameCtx.beginPath();
+                gameCtx.arc(this.x + this.width / 2, this.y + 12, 4, 0, Math.PI * 2);
+                gameCtx.fill();
+            }
+
+            ascend() {
+                if (!this.isAscending && isPlaying) {
+                    this.isAscending = true;
+                    this.velocityY = this.ascendPower;
+                }
+            }
+
+            update() {
+                if (this.isAscending) {
+                    this.y += this.velocityY;
+                    this.velocityY += this.gravity;
+                    if (this.y > GROUND_Y - this.height) {
+                        this.y = GROUND_Y - this.height;
+                        this.isAscending = false;
+                        this.velocityY = 0;
+                    }
+                }
+                this.draw();
+            }
+        }
+
+        class Obstacle {
+            constructor(x, width, height) {
+                this.x = x;
+                this.y = GROUND_Y - height;
+                this.width = width;
+                this.height = height;
+            }
+
+            draw() {
+                const obstacleColor = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
+                gameCtx.fillStyle = obstacleColor;
+                gameCtx.fillRect(this.x, this.y, this.width, this.height);
+            }
+
+            update() {
+                this.x -= gameSpeed;
+                this.draw();
+            }
+        }
+
+        let drone = new Drone();
+        let obstacles = [];
+
+        function spawnObstacle() {
+            const obstacleType = Math.random() > 0.3 ? 'column' : 'flyer';
+            let x = gameCanvas.width;
+            let width, height;
+
+            if (obstacleType === 'column') {
+                const size = Math.floor(Math.random() * 3) + 1;
+                width = 15 * size;
+                height = 35;
+            } else { // Flyer
+                width = 40;
+                height = 20;
+            }
+
+            const newObstacle = new Obstacle(x, width, height);
+            if (obstacleType === 'flyer') {
+                newObstacle.y = GROUND_Y - height - (Math.random() > 0.5 ? 25 : 0);
+            }
+
+            obstacles.push(newObstacle);
+        }
+
+        let obstacleSpawnTimer = 0;
+        let nextObstacleSpawnTime = 100;
+
+        function updateScore() {
+            score++;
+            if (score > highScore) {
+                highScore = score;
+            }
+            if (score % 100 === 0) {
+                gameSpeed += 0.5;
+            }
+        }
+
+        function drawScore() {
+            gameCtx.fillStyle = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
+            gameCtx.font = "bold 16px 'Inter', sans-serif";
+            gameCtx.textAlign = 'left';
+            const scoreText = `HI ${String(highScore).padStart(5, '0')} ${String(Math.floor(score / 10)).padStart(5, '0')}`;
+            gameCtx.fillText(scoreText, 20, 30);
+        }
+
+        function drawGround() {
+            gameCtx.beginPath();
+            gameCtx.moveTo(0, GROUND_Y);
+            gameCtx.lineTo(gameCanvas.width, GROUND_Y);
+            const groundColor = document.body.classList.contains('light') ? 'rgba(26, 26, 26, 0.5)' : 'rgba(240, 240, 240, 0.5)';
+            gameCtx.strokeStyle = groundColor;
+            gameCtx.lineWidth = 2;
+            gameCtx.stroke();
+        }
+
+        function detectCollision(a, b) {
+            return a.x < b.x + b.width &&
+                a.x + a.width > b.x &&
+                a.y < b.y + b.height &&
+                a.y + a.height > b.y;
+        }
+
+        function gameLoop() {
+            if (isGameOver) return;
+            gameAnimationFrameId = requestAnimationFrame(gameLoop);
+
+            gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+            drawGround();
+
+            drone.update();
+
+            obstacleSpawnTimer++;
+            if (obstacleSpawnTimer >= nextObstacleSpawnTime) {
+                spawnObstacle();
+                obstacleSpawnTimer = 0;
+                nextObstacleSpawnTime = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
+            }
+
+            obstacles.forEach((obstacle, index) => {
+                obstacle.update();
+                if (obstacle.x + obstacle.width < 0) {
+                    setTimeout(() => obstacles.splice(index, 1), 0);
+                }
+
+                if (detectCollision(drone, obstacle)) {
+                    endGame();
+                }
+            });
+
+            updateScore();
+            drawScore();
+        }
+
+        function startGame() {
+            if (isPlaying) return;
+            if (isGameOver) resetGame();
+
+            isPlaying = true;
+            isGameOver = false;
+            gameLoop();
+        }
+
+        function endGame() {
+            isPlaying = false;
+            isGameOver = true;
+            cancelAnimationFrame(gameAnimationFrameId);
+        }
+
+        function resetGame() {
+            score = 0;
+            gameSpeed = 5;
+            obstacles = [];
+            drone = new Drone();
+            isGameOver = false;
+        }
+
+        function handleInput(e) {
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
+                e.preventDefault();
+                if (!isPlaying) {
+                    startGame();
+                }
+                drone.ascend();
+            }
+        }
+
+        gameCanvas.addEventListener('keydown', handleInput);
+        gameCanvas.addEventListener('mousedown', () => {
+            if (!isPlaying) {
+                startGame();
+            }
+            drone.ascend();
+        });
+        gameCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!isPlaying) {
+                startGame();
+            }
+            drone.ascend();
+        });
+
+        function initGame() {
+            gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+            drawGround();
+            drone.draw();
+            drawScore();
+        }
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            // Redraw the game to update colors if it's not currently playing
+            if (!isPlaying) {
+                setTimeout(initGame, 10);
+            }
+        });
+
+        initGame();
+    </script>
+</body>
+
+</html>
