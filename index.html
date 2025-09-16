@@ -10,20 +10,42 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <!-- Font for the game -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&family=Limelight&family=Unica+One&display=swap" rel="stylesheet">
+    <!-- Font for boot animation -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <style>
         /* Custom styles for the dark theme and layout */
         body {
             background-color: #1a1a1a;
             color: #f0f0f0;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Josefin Sans', sans-serif;
             overflow-x: hidden;
             scroll-behavior: smooth;
             scrollbar-width: none;
             /* For Firefox */
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Josefin Sans', sans-serif;
+            font-weight: 400;
+        }
+
+        #skills-title, #projects-title, #certifications-title {
+            font-family: 'Limelight', cursive;
+        }
+
+        .font-heading {
+            font-family: 'Unica One', cursive;
+        }
+
+        header {
+            padding: 1rem 1.5rem;
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
         #background-canvas {
@@ -232,7 +254,7 @@
 
         .skill-label {
             position: absolute;
-            background: rgba(15, 157, 88, 0.2);
+            background: rgba(51, 102, 153, 0.2); /* Changed from green to theme blue */
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
             padding: 6px 12px;
@@ -241,7 +263,7 @@
             font-weight: 600;
             color: #f0f0f0;
             opacity: 0;
-            border: 1px solid rgba(15, 157, 88, 0.4);
+            border: 1px solid rgba(51, 102, 153, 0.4); /* Changed from green to theme blue */
             white-space: nowrap;
             transform: translate(-50%, -50%);
         }
@@ -369,18 +391,75 @@
             color: #F4B400;
         }
 
+        /* --- Scroll to Top Button --- */
+        #scrollToTopBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 100px;
+            width: 48px;
+            height: 48px;
+            background-color: transparent;
+            color: #888; /* Muted color for dark theme */
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out, transform 0.2s ease, color 0.2s ease;
+            z-index: 999;
+        }
+
+        #scrollToTopBtn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #scrollToTopBtn:hover {
+            color: #336699; /* Accent color on hover */
+            transform: scale(1.1);
+        }
+
+        #scrollToTopBtn svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        /* Responsive adjustment for smaller screens */
+        @media (max-width: 768px) {
+            #scrollToTopBtn {
+                bottom: 100px;
+                right: 1.5rem;
+            }
+        }
+
+
         /* --- Light Theme --- */
         body.light {
             background-color: #f0f2f5;
             color: #1a1a1a;
         }
 
+        body.light header {
+            background: rgba(240, 242, 245, 0.7);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        body.light #scrollToTopBtn {
+             color: #555; /* Darker grey for light background */
+        }
+        
+        body.light #scrollToTopBtn:hover {
+             color: #336699;
+        }
+
         body.light .skill-label {
             color: #1a1a1a;
-            background-color: rgba(15, 157, 88, 0.1);
+            background-color: rgba(51, 102, 153, 0.1); /* Changed from green to theme blue */
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            border-color: rgba(15, 157, 88, 0.3);
+            border-color: rgba(51, 102, 153, 0.3); /* Changed from green to theme blue */
         }
 
         body.light a.skill-label:hover {
@@ -489,14 +568,116 @@
             background-color: rgba(230, 230, 230, 0.8);
             border-color: rgba(0, 0, 0, 0.1);
         }
+        
+        /* --- Boot Animation --- */
+        body.loading main,
+        body.loading header,
+        body.loading footer,
+        body.loading #custom-scrollbar,
+        body.loading #dino-game-container,
+        body.loading #chatbot-toggle,
+        body.loading #chat-window,
+        body.loading #scrollToTopBtn {
+            visibility: hidden;
+        }
+
+        #boot-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #1a1a1a;
+            z-index: 9999;
+            font-family: 'Share Tech Mono', monospace;
+            color: #0F9D58; /* Reverted to green */
+        }
+
+        #boot-text-container {
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        #boot-text-container p {
+            margin: 0 0 0.5rem 0;
+            opacity: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: fadeInLine 0.5s forwards;
+        }
+
+        .progress-bar-container {
+            border: 1px solid #0F9D58; /* Reverted to green */
+            padding: 2px;
+            margin-top: 1rem;
+            opacity: 0;
+            animation: fadeInLine 0.5s 2.8s forwards;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 10px;
+            background-color: #0F9D58; /* Reverted to green */
+            animation: fillBar 1s 3.3s ease-out forwards;
+        }
+
+        #boot-text-container .final-text {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            color: #f0f0f0;
+            opacity: 0;
+            animation: fadeInLine 0.5s 4.5s forwards;
+        }
+
+        @keyframes fadeInLine {
+            to { opacity: 1; }
+        }
+
+        @keyframes fillBar {
+            to { width: 100%; }
+        }
+
+        /* Light theme adjustments for boot animation */
+        body.light #boot-animation {
+            background: #f0f2f5;
+            color: #0F9D58; /* Reverted to green */
+        }
+        body.light .progress-bar-container {
+            border-color: #0F9D58; /* Reverted to green */
+        }
+        body.light .progress-bar {
+            background-color: #0F9D58; /* Reverted to green */
+        }
+        body.light #boot-text-container .final-text {
+            color: #1a1a1a;
+        }
+
     </style>
 </head>
 
-<body class="antialiased">
+<body class="antialiased loading">
+
+    <!-- === Boot Animation Section === -->
+    <section id="boot-animation">
+        <div id="boot-text-container">
+            <p>> YW_WΞB Initializing...</p>
+            <p>> Loading Data Modules...</p>
+            <p>> Compiling Insights...</p>
+            <div class="progress-bar-container">
+                <div class="progress-bar"></div>
+            </div>
+            <p class="final-text">WELCOME</p>
+        </div>
+    </section>
+
     <canvas id="background-canvas"></canvas>
 
-    <header class="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-wider text-white">Yogvid Wankhede</h1>
+    <header class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center">
+        <h1 class="text-lg tracking-wider text-white">Yogvid Wankhede</h1>
         <nav class="flex items-center space-x-6">
             <button id="theme-toggle" type="button" class="text-gray-300 hover:text-white transition-colors"
                 aria-label="Toggle theme">
@@ -556,16 +737,16 @@
                     Welcome to my world
                 </p>
 
-                <h1 class="text-4xl md:text-6xl font-bold">
+                <h1 class="text-3xl md:text-5xl">
                     Hi, I’m <span class="text-[#336699]">Yogvid Wankhede</span>
                 </h1>
 
-                <!-- Rotating words -->
-                <div class="relative h-10 mb-4 text-2xl md:text-3xl font-semibold rotate-words">
-                    <span>Data Science Expert.</span>
-                    <span>AI & Machine Learning Engineer.</span>
-                    <span>Problem Solver.</span>
+                <!-- Typing animation -->
+                 <div class="relative h-10 mb-4 text-lg md:text-2xl font-heading">
+                    <span id="typewriter-text" class="whitespace-nowrap"></span>
+                    <span id="typewriter-cursor" class="border-l-2 border-gray-400"></span>
                 </div>
+
 
                 <p class="text-gray-300 max-w-md mx-auto md:mx-0">
                     I specialize in extracting meaningful insights from complex datasets and
@@ -589,53 +770,31 @@
 
         <!-- Place this small CSS either in the <head> <style> or your CSS file -->
         <style>
-            /* Rotating words animation */
-            .rotate-words span {
-                position: absolute;
-                opacity: 0;
-                animation: rotate 9s linear infinite 0s;
-            }
-
-            .rotate-words span:nth-child(1) {
-                animation-delay: 0s;
-            }
-
-            .rotate-words span:nth-child(2) {
-                animation-delay: 3s;
-            }
-
-            .rotate-words span:nth-child(3) {
-                animation-delay: 6s;
-            }
-
-            @keyframes rotate {
-
-                0%,
-                20% {
-                    opacity: 1;
+            /* Blinking cursor animation */
+            @keyframes blink {
+                50% {
+                    border-color: transparent;
                 }
-
-                33.33%,
-                100% {
-                    opacity: 0;
-                }
+            }
+            #typewriter-cursor {
+                animation: blink 0.7s step-end infinite;
             }
         </style>
 
 
-        <h2 id="skills-title" class="text-4xl font-bold fixed top-20 left-20 text-white opacity-0 z-20"
+        <h2 id="skills-title" class="text-3xl fixed top-20 left-20 text-white opacity-0 z-20"
             style="transform: translateX(-30px);">
-            Technical Skills
+            Domain Expertise
         </h2>
 
-        <h2 id="projects-title" class="text-4xl font-bold fixed top-20 left-20 text-white opacity-0 z-20"
+        <h2 id="projects-title" class="text-3xl fixed top-20 left-20 text-white opacity-0 z-20"
             style="transform: translateX(-30px);">
-            Key Projects
+            Highlighted Work
         </h2>
 
-        <h2 id="certifications-title" class="text-4xl font-bold fixed top-20 left-20 text-white opacity-0 z-20"
+        <h2 id="certifications-title" class="text-3xl fixed top-20 left-20 text-white opacity-0 z-20"
             style="transform: translateX(-30px);">
-            Certifications
+            Professional Credentials
         </h2>
 
 
@@ -658,36 +817,37 @@
         <section id="contact" class="w-full bg-[#1a1a1a] py-20 px-4 md:px-8">
             <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
                 <div class="space-y-6">
-                    <h2 class="text-3xl font-bold">Send a Message</h2>
-                    <form action="#" class="space-y-4">
+                    <h2 class="text-2xl">Send a Message</h2>
+                    <form id="contact-form" class="space-y-4">
                         <div>
                             <label for="name" class="text-sm font-medium text-gray-400">Name</label>
-                            <input type="text" id="name" name="name" class="form-input w-full mt-1 p-3 rounded-lg"
-                                placeholder="Your Name">
+                            <input type="text" id="name" name="user_name" class="form-input w-full mt-1 p-3 rounded-lg"
+                                placeholder="Your Name" required>
                         </div>
                         <div>
                             <label for="email" class="text-sm font-medium text-gray-400">Email</label>
-                            <input type="email" id="email" name="email" class="form-input w-full mt-1 p-3 rounded-lg"
-                                placeholder="Your Email">
+                            <input type="email" id="email" name="user_email" class="form-input w-full mt-1 p-3 rounded-lg"
+                                placeholder="Your Email" required>
                         </div>
                         <div>
                             <label for="subject" class="text-sm font-medium text-gray-400">Subject</label>
                             <input type="text" id="subject" name="subject" class="form-input w-full mt-1 p-3 rounded-lg"
-                                placeholder="Subject">
+                                placeholder="Subject" required>
                         </div>
                         <div>
                             <label for="message" class="text-sm font-medium text-gray-400">Message</label>
                             <textarea id="message" name="message" rows="4"
-                                class="form-textarea w-full mt-1 p-3 rounded-lg" placeholder="Your Message"></textarea>
+                                class="form-textarea w-full mt-1 p-3 rounded-lg" placeholder="Your Message" required></textarea>
                         </div>
                         <button type="submit"
-                            class="w-full bg-[#336699] text-white font-bold py-3 px-6 rounded-lg bg-opacity-40 transition-all">
+                            class="w-full bg-[#336699] text-white py-3 px-6 rounded-lg bg-opacity-40 transition-all">
                             Send Message
                         </button>
                     </form>
+                    <p id="form-status" class="mt-4 text-center h-4"></p>
                 </div>
                 <div class="space-y-8">
-                    <h2 class="text-3xl font-bold">Get In Touch</h2>
+                    <h2 class="text-2xl">Get In Touch</h2>
                     <p class="text-gray-400">
                         Feel free to contact me for any work or suggestions. I'm always open to discussing new projects,
                         creative ideas, or opportunities to be part of your vision.
@@ -703,7 +863,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-semibold">Email</h3>
+                                <h3 class="">Email</h3>
                                 <p class="text-gray-400">yogvidwankhede@gmail.com</p>
                             </div>
                         </div>
@@ -719,13 +879,13 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="font-semibold">Location</h3>
+                                <h3 class="">Location</h3>
                                 <p class="text-gray-400">Nagpur, India</p>
                             </div>
                         </div>
                     </div>
                     <div>
-                        <h3 class="font-semibold mb-4">Connect with me</h3>
+                        <h3 class="mb-4">Connect with me</h3>
                         <div class="flex space-x-4">
                             <a href="https://github.com/yogvidwankhede" target="_blank"
                                 class="social-icon p-3 rounded-lg inline-block">
@@ -785,7 +945,7 @@
 
     <div id="chat-window" class="hidden glass-morphism flex flex-col">
         <div id="chat-header" class="flex justify-between items-center p-4 border-b border-[#336699]/40">
-            <h3 class="font-bold text-lg text-white">Portfolio Assistant</h3>
+            <h3 class="text-base text-white">Portfolio Assistant</h3>
             <button id="close-chat" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
         </div>
         <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col space-y-2">
@@ -804,6 +964,14 @@
         </form>
     </div>
 
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTopBtn" aria-label="Scroll to top">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+        </svg>
+    </button>
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
@@ -811,8 +979,30 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
+    <!-- EmailJS SDK -->
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
+            // --- Boot Animation Logic ---
+            const bootAnimation = document.getElementById('boot-animation');
+            setTimeout(() => {
+                if (bootAnimation) {
+                    gsap.to(bootAnimation, {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            bootAnimation.style.display = 'none';
+                        }
+                    });
+                }
+                document.body.classList.remove('loading');
+            }, 5000); // Wait for the full boot sequence to finish
+
+            // Scroll to top on page load/refresh
+            window.scrollTo(0, 0);
+            
             // --- 1. SETUP ---
             const pinnedElement = document.getElementById('pinned-element');
             const scrollContentContainer = document.getElementById('scroll-content-container');
@@ -824,7 +1014,7 @@
 
 
             // Theme switcher logic
-            if (localStorage.getItem('color-theme') === 'light' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+            if (localStorage.getItem('color-theme') === 'light') {
                 lightIcon.classList.remove('hidden');
                 darkIcon.classList.add('hidden');
                 bodyEl.classList.add('light');
@@ -1191,8 +1381,8 @@
                         wrapper.target = '_blank';
                         wrapper.rel = 'noopener noreferrer';
                         wrapper.style.cursor = 'pointer';
-                        wrapper.addEventListener('mouseenter', () => gsap.to(wrapper, { backgroundColor: 'rgba(15, 157, 88, 0.4)', borderColor: 'rgba(15, 157, 88, 0.7)', duration: 0.2 }));
-                        wrapper.addEventListener('mouseleave', () => gsap.to(wrapper, { backgroundColor: 'rgba(15, 157, 88, 0.2)', borderColor: 'rgba(15, 157, 88, 0.4)', duration: 0.2 }));
+                        wrapper.addEventListener('mouseenter', () => gsap.to(wrapper, { backgroundColor: 'rgba(51, 102, 153, 0.4)', borderColor: 'rgba(51, 102, 153, 0.7)', duration: 0.2 }));
+                        wrapper.addEventListener('mouseleave', () => gsap.to(wrapper, { backgroundColor: 'rgba(51, 102, 153, 0.2)', borderColor: 'rgba(51, 102, 153, 0.4)', duration: 0.2 }));
                     }
 
                     wrapper.className = 'skill-label';
@@ -1513,6 +1703,96 @@
             setTimeout(() => {
                 addMessage("Hello! I’m your Portfolio Assistant — here to provide insights about my skills, projects, and professional experience. Ask me anything to explore my work.", 'bot');
             }, 2000);
+            
+            // --- Scroll to Top Logic ---
+            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 100) {
+                    scrollToTopBtn.classList.add('visible');
+                } else {
+                    scrollToTopBtn.classList.remove('visible');
+                }
+            });
+
+            scrollToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // --- Typewriter Animation Logic ---
+            const typewriterTextElement = document.getElementById('typewriter-text');
+            const words = ["Data Science Expert.", "AI & Machine Learning Engineer.", "Problem Solver."];
+            let wordIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+
+            function type() {
+                const currentWord = words[wordIndex];
+                
+                if (isDeleting) {
+                    // Deleting characters
+                    typewriterTextElement.textContent = currentWord.substring(0, charIndex - 1);
+                    charIndex--;
+                    if (charIndex === 0) {
+                        isDeleting = false;
+                        wordIndex = (wordIndex + 1) % words.length;
+                        setTimeout(type, 500); // Pause before typing next word
+                    } else {
+                        setTimeout(type, 50); // Deleting speed
+                    }
+                } else {
+                    // Typing characters
+                    typewriterTextElement.textContent = currentWord.substring(0, charIndex + 1);
+                    charIndex++;
+                    if (charIndex === currentWord.length) {
+                        isDeleting = true;
+                        setTimeout(type, 2000); // Pause after typing word
+                    } else {
+                        setTimeout(type, 100); // Typing speed
+                    }
+                }
+            }
+
+            type(); // Start the animation
+
+            // --- EmailJS Contact Form Logic ---
+            (function() {
+                // IMPORTANT: Replace with your public key from https://dashboard.emailjs.com/admin/account
+                emailjs.init('7l_R7rukU6L1mQggO'); 
+            })();
+
+            const contactForm = document.getElementById('contact-form');
+            const formStatus = document.getElementById('form-status');
+
+            contactForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const submitButton = this.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Sending...';
+                formStatus.textContent = '';
+
+
+                // IMPORTANT: Replace with your Service ID and Template ID from EmailJS
+                emailjs.sendForm('service_ouxgpae', 'template_9ibf918', this)
+                    .then(function() {
+                        formStatus.textContent = 'Message sent successfully!';
+                        formStatus.style.color = '#0F9D58';
+                        contactForm.reset();
+                    }, function(error) {
+                        formStatus.textContent = 'Failed to send message. Please try again.';
+                        formStatus.style.color = '#DB4437';
+                        console.error('EmailJS FAILED...', error);
+                    })
+                    .finally(() => {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Send Message';
+                        setTimeout(() => { formStatus.textContent = ''; }, 5000);
+                    });
+            });
 
         });
     </script>
@@ -1764,3 +2044,13 @@
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
