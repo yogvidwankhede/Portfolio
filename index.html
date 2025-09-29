@@ -326,20 +326,121 @@
         .skill-label {
             position: absolute;
             background: rgba(51, 102, 153, 0.2);
-            /* Changed from green to theme blue */
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 16px;
             font-weight: 600;
             color: #f0f0f0;
             opacity: 0;
             border: 1px solid rgba(51, 102, 153, 0.4);
-            /* Changed from green to theme blue */
             white-space: nowrap;
             transform: translate(-50%, -50%);
         }
+
+        /* --- CERTIFICATION LOGO STYLES --- */
+        #certifications {
+            background-color: #111111;
+        }
+
+        body.light #certifications {
+            background-color: #e9e9ed;
+        }
+
+        #certification-grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 2.5rem;
+            padding: 2rem 0;
+        }
+
+        .company-logo-wrapper {
+            position: relative;
+            width: 16vmin;
+            height: 16vmin;
+            min-width: 120px;
+            min-height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            /* Add padding to bridge the hover gap */
+            padding-bottom: 15px;
+            margin-bottom: -15px;
+        }
+
+        .company-logo {
+            max-width: 80%;
+            max-height: 80%;
+            opacity: 0.7;
+            filter: grayscale(80%);
+            transition: opacity 0.3s ease, filter 0.3s ease;
+        }
+
+        .company-logo-wrapper:hover .company-logo {
+            opacity: 1;
+            filter: grayscale(0%);
+        }
+
+        .company-logo-wrapper:hover {
+            transform: scale(1.1);
+        }
+
+        .certificate-list {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 30, 30, 0.9);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            list-style: none;
+            width: max-content;
+            max-width: 300px;
+            z-index: 40;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s;
+            pointer-events: none;
+        }
+
+        body.light .certificate-list {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .company-logo-wrapper:hover .certificate-list {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .certificate-list li a {
+            display: block;
+            padding: 8px 12px;
+            color: #f0f0f0;
+            text-decoration: none;
+            font-size: 21px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        body.light .certificate-list li a {
+            color: #1a1a1a;
+        }
+
+        .certificate-list li a:hover {
+            background-color: rgba(51, 102, 153, 0.5);
+        }
+
+        /* --- END OF STYLES --- */
 
         /* --- Custom Scrollbar --- */
         #custom-scrollbar {
@@ -533,11 +634,9 @@
         body.light .skill-label {
             color: #1a1a1a;
             background-color: rgba(51, 102, 153, 0.1);
-            /* Changed from green to theme blue */
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
             border-color: rgba(51, 102, 153, 0.3);
-            /* Changed from green to theme blue */
         }
 
         body.light a.skill-label:hover {
@@ -672,7 +771,6 @@
             z-index: 9999;
             font-family: 'Share Tech Mono', monospace;
             color: #0F9D58;
-            /* Reverted to green */
         }
 
         #boot-text-container {
@@ -690,7 +788,6 @@
 
         .progress-bar-container {
             border: 1px solid #0F9D58;
-            /* Reverted to green */
             padding: 2px;
             margin-top: 1rem;
             opacity: 0;
@@ -701,7 +798,6 @@
             width: 0%;
             height: 10px;
             background-color: #0F9D58;
-            /* Reverted to green */
             animation: fillBar 1s 3.3s ease-out forwards;
         }
 
@@ -730,17 +826,14 @@
         body.light #boot-animation {
             background: #f0f2f5;
             color: #0F9D58;
-            /* Reverted to green */
         }
 
         body.light .progress-bar-container {
             border-color: #0F9D58;
-            /* Reverted to green */
         }
 
         body.light .progress-bar {
             background-color: #0F9D58;
-            /* Reverted to green */
         }
 
         body.light #boot-text-container .final-text {
@@ -822,27 +915,21 @@
 
     <main class="relative z-10">
 
-        <!-- === NEW HERO SECTION === -->
+        <!-- === HERO SECTION === -->
         <section id="intro-hero"
             class="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-20 relative overflow-hidden">
             <canvas id="snow-canvas"></canvas>
-            <!-- Text content on the left -->
             <div class="md:w-1/2 text-center md:text-left space-y-6 relative z-10">
                 <p class="uppercase tracking-widest text-gray-400 text-sm">
                     Welcome to my world
                 </p>
-
                 <h1 class="text-3xl md:text-5xl font-bold">
                     Hi, I’m <span class="text-[#336699]">Yogvid Wankhede</span>
                 </h1>
-
-                <!-- Typing animation -->
                 <div class="relative h-10 mb-4 text-lg md:text-2xl">
                     <span id="typewriter-text" class="whitespace-nowrap"></span>
                     <span id="typewriter-cursor" class="border-l-2 border-gray-400"></span>
                 </div>
-
-
                 <p class="text-gray-300 max-w-md mx-auto md:mx-0">
                     I specialize in extracting meaningful insights from complex datasets and
                     building intelligent systems. From predictive modeling to deep learning
@@ -850,9 +937,9 @@
                 </p>
 
                 <div class="flex justify-center md:justify-start space-x-4 pt-4">
-                    <a href="#pinned-container"
+                    <a href="#certifications"
                         class="bg-[#336699] hover:bg-[#29527a] text-white px-6 py-2 rounded-full transition">
-                        View Skills
+                        View Credentials
                     </a>
                     <a href="#contact"
                         class="border border-[#336699] hover:bg-[#336699] hover:text-white px-6 py-2 rounded-full transition">
@@ -863,26 +950,18 @@
             <!-- Empty div to push content to the left on desktop -->
             <div class="md:w-1/2"></div>
         </section>
-        <!-- === END OF NEW HERO SECTION === -->
 
-
-        <h2 id="skills-title" class="text-3xl fixed top-20 left-20 text-white opacity-0 z-20"
+        <!-- === SCROLLING HUD SECTION === -->
+        <h2 id="skills-title" class="text-4xl fixed top-20 left-20 text-white opacity-0 z-20"
             style="transform: translateX(-30px);">
             Domain Expertise
         </h2>
-
-        <h2 id="projects-title" class="text-3xl fixed top-20 left-20 text-white opacity-0 z-20"
+        <h2 id="projects-title" class="text-4xl fixed top-20 left-20 text-white opacity-0 z-20"
             style="transform: translateX(-30px);">
             Highlighted Work
         </h2>
 
-        <h2 id="certifications-title" class="text-3xl fixed top-20 left-20 text-white opacity-0 z-20"
-            style="transform: translateX(-30px);">
-            Professional Credentials
-        </h2>
-
-
-        <div id="pinned-container" class="h-[900vh] relative w-full">
+        <div id="pinned-container" class="h-[700vh] relative w-full">
             <div id="pin-wrapper" class="h-screen w-full sticky top-0 left-0 overflow-hidden">
                 <div id="callout-container">
                     <div id="callout-labels-container"></div>
@@ -890,14 +969,29 @@
                         style="position: absolute; top:0; left:0; width:100%; height:100%;"></svg>
                 </div>
                 <div class="absolute inset-0 flex justify-center items-center">
-                    <div id="pinned-element">
-                    </div>
+                    <div id="pinned-element"></div>
                 </div>
-                <div id="scroll-content-container" class="absolute inset-0 flex items-center justify-between">
-                </div>
+                <div id="scroll-content-container" class="absolute inset-0 flex items-center justify-between"></div>
             </div>
         </div>
 
+        <!-- === NEW CERTIFICATIONS SECTION === -->
+        <section id="certifications" class="w-full py-20 px-4 md:px-8">
+            <div class="max-w-6xl mx-auto text-center">
+                <h2 id="certifications-title" class="text-5xl mb-16">Professional Credentials</h2>
+                <div id="certification-grid-container">
+                    <!-- Logos will be injected by JS here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SEPARATOR -->
+        <div class="max-w-5xl mx-auto px-4 md:px-8">
+            <div class="border-t border-gray-700/50 dark:border-gray-300/20"></div>
+        </div>
+
+
+        <!-- === CONTACT SECTION === -->
         <section id="contact" class="w-full bg-[#1a1a1a] py-20 px-4 md:px-8">
             <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
                 <div class="space-y-6">
@@ -1148,8 +1242,6 @@
                 { title: "", description: "", align: 'right' },
                 { title: "", description: "", align: 'left' },
                 { title: "", description: "", align: 'right' },
-                { title: "", description: "", align: 'left' },
-                { title: "", description: "", align: 'right' }
             ];
 
             const svgs = {
@@ -1168,131 +1260,157 @@
                         "Data Modeling", "Machine Learning", "NLP"
                     ],
                     positions: [
-                        { x: '75%', y: '15%' }, // top-right
-                        { x: '90%', y: '30%' }, // upper-mid-right
-                        { x: '60%', y: '25%' }, // upper-mid (not center, not too left)
-                        { x: '85%', y: '45%' }, // right-mid
-                        { x: '70%', y: '40%' }, // mid-upper-right
-                        { x: '15%', y: '55%' }, // left-mid (not top-left, not far edge)
-                        { x: '25%', y: '70%' }, // bottom-left quadrant
-                        { x: '40%', y: '85%' }, // bottom-left-mid
-                        { x: '65%', y: '75%' }, // lower-mid-right
-                        { x: '80%', y: '65%' }, // lower-right
-                        { x: '55%', y: '90%' }, // bottom-mid
-                        { x: '90%', y: '80%' }, // bottom-right
-                        { x: '35%', y: '60%' }  // lower-left-mid
+                        { x: '75%', y: '15%' }, { x: '90%', y: '30%' }, { x: '60%', y: '25%' },
+                        { x: '85%', y: '45%' }, { x: '70%', y: '40%' }, { x: '15%', y: '55%' },
+                        { x: '25%', y: '70%' }, { x: '40%', y: '85%' }, { x: '65%', y: '75%' },
+                        { x: '80%', y: '65%' }, { x: '55%', y: '90%' }, { x: '90%', y: '80%' },
+                        { x: '35%', y: '60%' }
                     ]
-
                 },
                 projects: {
                     labels: [
-                        "Real-Time Sign Language Interpreter",
-                        "Educational Resource Management",
-                        "Hospital Data Analysis",
-                        "Fake News Detection",
-                        "Image Captioning System"
+                        "Real-Time Sign Language Interpreter", "Educational Resource Management",
+                        "Hospital Data Analysis", "Fake News Detection", "Image Captioning System"
                     ],
                     urls: [
-                        "https://github.com/yogvidwankhede/Sign_Language_Interpreter", // Replace with your project link
-                        "https://github.com/yogvidwankhede/Educational-Resource-Management", // Replace with your project link
-                        "https://github.com/yogvidwankhede/EDA", // Replace with your project link
-                        "https://github.com/yogvidwankhede/Fake_News_Detection", // Replace with your project link
-                        "#"  // Replace with your project link
+                        "https://github.com/yogvidwankhede/Sign_Language_Interpreter",
+                        "https://github.com/yogvidwankhede/Educational-Resource-Management",
+                        "https://github.com/yogvidwankhede/EDA",
+                        "https://github.com/yogvidwankhede/Fake_News_Detection",
+                        "#"
                     ],
                     positions: [
-                        { x: '75%', y: '20%' }, // top-right
-                        { x: '85%', y: '40%' }, // upper-mid-right
-                        { x: '65%', y: '55%' }, // mid-lower
-                        { x: '25%', y: '70%' }, // bottom-left-mid
-                        { x: '80%', y: '85%' }  // bottom-right
+                        { x: '75%', y: '20%' }, { x: '85%', y: '40%' }, { x: '65%', y: '55%' },
+                        { x: '25%', y: '70%' }, { x: '80%', y: '85%' }
                     ]
-
                 },
-                certifications: {
-                    labels: [
-                        // Certifications
-                        "Google Advanced Data Analytics Professional",
-                        "DeepLearning.AI TensorFlow Developer",
-                        "Python 3 Programming",
-                        "Microsoft 365 Fundamentals",
-
-                        // Data Job Simulations
-                        "BCG - Data Science Job Simulation",
-                        "BCG - GenAI Job Simulation",
-                        "Deloitte Australia - Data Analytics Job Simulation",
-                        "EAB - GenAI for Proposal Generation Job Simulation",
-                        "J.P. Morgan - Quantitative Research Job Simulation",
-                        "Lloyds Banking Group - Data Science Job Simulation",
-                        "Quantium - Data Analytics Job Simulation",
-                        "Tata - Cybersecurity Analyst Job Simulation",
-                        "Tata - Data Visualisation: Empowering Business with Effective Insights Job Simulation",
-                        "Tata - GenAI Powered Data Analytics Job Simulation",
-
-                        // Software Job Simulations
-                        "Datacom - Automation Job Simulation",
-                        "Electronic Arts - Software Engineering Job Simulation",
-                        "J.P. Morgan - Software Engineering Job Simulation",
-                        "Johnson and Johnson - Robotics and Controls Job Simulation",
-                        "Mastercard - Cybersecurity Job Simulation",
-                        "Walmart USA - Advanced Software Engineering Job Simulation",
-
-                        // Other
-                        "Forage Academy - Branding & Design Job Simulation"
-                    ],
-                    urls: [
-                        "https://www.coursera.org/account/accomplishments/professional-cert/2F66GDKEUNLK", // Replace with your certification link
-                        "https://www.coursera.org/account/accomplishments/professional-cert/PAUSSXCRK9YL", // Replace with your certification link
-                        "https://drive.google.com/file/d/169OETqm19aT5-wTkfsaMtckLV9ipf5w4/view?usp=sharing", // Replace with your certification link
-                        "https://www.coursera.org/account/accomplishments/specialization/2EUL5E7W7JNU",
-                        "#",  // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#", // Replace with your certification link
-                        "#" // Replace with your certification link
-                    ],
-                    positions: [
-                        // Outer Ring (12 positions)
-                        { x: '50%', y: '15%' },   // top-center
-                        { x: '75%', y: '15%' },  // top-right-quarter
-                        { x: '90%', y: '35%' },  // upper-right
-                        { x: '95%', y: '50%' },  // right-center
-                        { x: '90%', y: '65%' },  // lower-right
-                        { x: '75%', y: '85%' },  // bottom-right-quarter
-                        { x: '50%', y: '95%' },  // bottom-center
-                        { x: '25%', y: '85%' },  // bottom-left-quarter
-                        { x: '10%', y: '65%' },  // lower-left
-                        { x: '5%', y: '50%' },  // left-center
-                        { x: '10%', y: '35%' },  // upper-left
-                        { x: '25%', y: '15%' },  // top-left-quarter
-
-                        // Inner Ring (8 positions)
-                        { x: '50%', y: '25%' },  // inner-top
-                        { x: '68%', y: '32%' },  // inner-top-right
-                        { x: '75%', y: '50%' },  // inner-right
-                        { x: '68%', y: '68%' },  // inner-bottom-right
-                        { x: '50%', y: '75%' },  // inner-bottom
-                        { x: '32%', y: '68%' },  // inner-bottom-left
-                        { x: '25%', y: '50%' },  // inner-left
-                        { x: '32%', y: '32%' },  // inner-top-left
-
-                        // Center (1 position)
-                        { x: '50%', y: '50%' }   // absolute-center
-                    ]
-
-                }
+                certifications: [
+                    {
+                        company: 'Google',
+                        logo: 'https://www.vectorlogo.zone/logos/google/google-icon.svg',
+                        credentials: [
+                            { name: 'Advanced Data Analytics Professional', url: 'https://www.coursera.org/account/accomplishments/professional-cert/2F66GDKEUNLK' }
+                        ]
+                    },
+                    {
+                        company: 'DeepLearning.AI',
+                        logo: 'https://cdn.brandfetch.io/idcuOol42D/theme/dark/symbol.svg?c=1bxid64Mup7aczewSAYMX&t=1668081047590',
+                        credentials: [
+                            { name: 'TensorFlow Developer Professional', url: 'https://www.coursera.org/account/accomplishments/professional-cert/PAUSSXCRK9YL' }
+                        ]
+                    },
+                    {
+                        company: 'Microsoft',
+                        logo: 'https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg',
+                        credentials: [
+                            { name: 'Microsoft 365 Fundamentals', url: 'https://www.coursera.org/account/accomplishments/specialization/2EUL5E7W7JNU' }
+                        ]
+                    },
+                    {
+                        company: 'J.P. Morgan',
+                        logo: 'https://cdn.brandfetch.io/idB8rdGiLv/w/200/h/200/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1727703975236',
+                        credentials: [
+                            { name: 'Quantitative Research Job Simulation', url: 'https://www.theforage.com/completion-certificates/Sj7temL583QAYpHXD/bWqaecPDbYAwSDqJy_Sj7temL583QAYpHXD_68cb1c8d15c59647ef0fd6d3_1758767942630_completion_certificate.pdf' },
+                            { name: 'Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/Sj7temL583QAYpHXD/E6McHJDKsQYh79moz_Sj7temL583QAYpHXD_68cb1c8d15c59647ef0fd6d3_1758692204442_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'Tata',
+                        logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Tata_logo.svg',
+                        credentials: [
+                            { name: 'Cybersecurity Analyst Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gmf3ypEXBj2wvfQWC_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758714476711_completion_certificate.pdf' },
+                            { name: 'Data Visualisation Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/MyXvBcppsW2FkNYCX_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758777844048_completion_certificate.pdf' },
+                            { name: 'GenAI Powered Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gMTdCXwDdLYoXZ3wG_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758863812597_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'BCG',
+                        logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/BCG_Corporate_Logo.svg',
+                        credentials: [
+                            { name: 'Data Science Job Simulation', url: 'https://www.theforage.com/completion-certificates/SKZxezskWgmFjRvj9/Tcz8gTtprzAS4xSoK_SKZxezskWgmFjRvj9_68cb1c8d15c59647ef0fd6d3_1758857325840_completion_certificate.pdf' },
+                            { name: 'GenAI Job Simulation', url: 'https://www.theforage.com/completion-certificates/SKZxezskWgmFjRvj9/gabev3vXhuACr48eb_SKZxezskWgmFjRvj9_68cb1c8d15c59647ef0fd6d3_1758884088047_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'Walmart',
+                        logo: 'https://www.vectorlogo.zone/logos/walmart/walmart-icon.svg',
+                        credentials: [
+                            { name: 'Advanced Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/prBZoAihniNijyD6d/oX6f9BbCL9kJDJzfg_prBZoAihniNijyD6d_68cb1c8d15c59647ef0fd6d3_1758710338762_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'Johnson&Johnson',
+                        logo: 'https://cdn.brandfetch.io/idBwyRkMdk/w/400/h/400/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1721633464973',
+                        credentials: [
+                            { name: 'Robotics and Controls Job Simulation', url: 'https://www.theforage.com/completion-certificates/3w79S9RRBtn9noDWZ/q8m3gpN4ETXnjapPq_3w79S9RRBtn9noDWZ_68cb1c8d15c59647ef0fd6d3_1758866617136_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'Lloyds Banking Group',
+                        logo: 'https://cdn.brandfetch.io/idGB0ZmIES/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1682688649936',
+                        credentials: [
+                            { name: 'Data Science Job Simulation', url: 'https://www.theforage.com/completion-certificates/Zbnc2o4ok6kD2NEXx/EuvC8GPjkZ6xaiP9p_Zbnc2o4ok6kD2NEXx_68cb1c8d15c59647ef0fd6d3_1758779762939_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'Deloitte',
+                        logo: 'https://cdn.brandfetch.io/idIu-Ji9Le/w/320/h/320/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1670911863379',
+                        credentials: [
+                            { name: 'Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/9PBTqmSxAf6zZTseP/io9DzWKe3PTsiS6GG_9PBTqmSxAf6zZTseP_68cb1c8d15c59647ef0fd6d3_1758809029968_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'Mastercard',
+                        logo: 'https://cdn.brandfetch.io/idFw8DodCr/theme/dark/symbol.svg?c=1bxid64Mup7aczewSAYMX&t=1721117489739',
+                        credentials: [
+                            { name: 'Cybersecurity Job Simulation', url: 'https://www.theforage.com/completion-certificates/mfxGwGDp6WkQmtmTf/vcKAB5yYAgvemepGQ_mfxGwGDp6WkQmtmTf_68cb1c8d15c59647ef0fd6d3_1758712489219_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'Electronic Arts',
+                        logo: 'https://cdn.brandfetch.io/idT4nN4-os/theme/dark/idGewYlRz-.svg?c=1bxid64Mup7aczewSAYMX&t=1758357511674',
+                        credentials: [
+                            { name: 'Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/j43dGscQHtJJ57N54/a77WE3de8qrxWferQ_j43dGscQHtJJ57N54_68cb1c8d15c59647ef0fd6d3_1758695096188_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'Quantium',
+                        logo: 'https://cdn.brandfetch.io/idKz2rVWH7/w/200/h/200/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1671600668132',
+                        credentials: [
+                            { name: 'Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/32A6DqtsbF7LbKdcq/NkaC7knWtjSbi6aYv_32A6DqtsbF7LbKdcq_68cb1c8d15c59647ef0fd6d3_1758805395283_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'Forage',
+                        logo: 'https://cdn.brandfetch.io/idV710Mm_L/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1758723297034',
+                        credentials: [
+                            { name: 'Branding & Design Job Simulation', url: 'https://www.theforage.com/completion-certificates/HgpPSsyQpzob6HEh9/GEZvgDCZaMT3rqfRr_HgpPSsyQpzob6HEh9_68cb1c8d15c59647ef0fd6d3_1758706723589_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'Asterisc-python3',
+                        logo: 'https://media.licdn.com/dms/image/v2/C4E0BAQFUhFRPs7-FhQ/company-logo_200_200/company-logo_200_200/0/1648012700372?e=2147483647&v=beta&t=_aheMqvXP1LzcfppuMh_UmEa0ttUVCf0kHIhZg1muQY',
+                        credentials: [
+                            { name: 'Python-3 Programming', url: 'https://drive.google.com/file/d/169OETqm19aT5-wTkfsaMtckLV9ipf5w4/view?usp=sharing' }
+                        ]
+                    },
+                    {
+                        company: 'EAB',
+                        logo: 'https://cdn.brandfetch.io/idivkYLQU6/w/400/h/400/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1751876733701',
+                        credentials: [
+                            { name: 'GenAI for Proposal Generation Job Simulation', url: 'https://www.theforage.com/completion-certificates/PSJm5xBFZtjjf9AnA/i2nMh36aEWT7awGCa_PSJm5xBFZtjjf9AnA_68cb1c8d15c59647ef0fd6d3_1758860940395_completion_certificate.pdf' }
+                        ]
+                    },
+                    {
+                        company: 'Datacom',
+                        logo: 'https://cdn.brandfetch.io/idLi03Oj_s/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1695336646053',
+                        credentials: [
+                            { name: 'Automation Job Simulation', url: 'https://www.theforage.com/completion-certificates/gCW7Xki5Y3vNpBmnn/Nw3MzxF2wjmki7Qor_gCW7Xki5Y3vNpBmnn_68cb1c8d15c59647ef0fd6d3_1758858217488_completion_certificate.pdf' }
+                        ]
+                    },
+                ]
             };
+
 
             // --- 3. DYNAMIC CONTENT INJECTION ---
             let contentHTML = '';
@@ -1310,23 +1428,14 @@
                 const ctx = canvas.getContext('2d');
                 let particles = [];
                 let animationId;
-                const mouse = {
-                    x: undefined,
-                    y: undefined,
-                    radius: 150 // Interaction radius
-                };
+                const mouse = { x: undefined, y: undefined, radius: 150 };
 
                 let mouseMoveListener, mouseOutListener;
 
                 function hexToRgb(hex) {
                     let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-                    return result ? {
-                        r: parseInt(result[1], 16),
-                        g: parseInt(result[2], 16),
-                        b: parseInt(result[3], 16)
-                    } : null;
+                    return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
                 }
-
                 const rgbColor = hexToRgb(color);
 
                 function resizeCanvas() {
@@ -1342,7 +1451,6 @@
                 resizeCanvas();
                 window.addEventListener('resize', resizeCanvas);
 
-                // Add mouse listeners
                 mouseMoveListener = (event) => {
                     const rect = canvas.getBoundingClientRect();
                     mouse.x = event.clientX - rect.left;
@@ -1359,15 +1467,12 @@
                     constructor() {
                         this.x = Math.random() * canvas.width;
                         this.y = Math.random() * canvas.height;
-                        this.baseX = this.x;
-                        this.baseY = this.y;
                         this.vx = Math.random() * 0.4 - 0.2;
                         this.vy = Math.random() * 0.4 - 0.2;
                         this.radius = 1.8;
-                        this.density = (Math.random() * 20) + 5; // How much it reacts to the mouse
+                        this.density = (Math.random() * 20) + 5;
                     }
                     update() {
-                        // Mouse interaction logic
                         if (mouse.x !== undefined && mouse.y !== undefined) {
                             let dx = mouse.x - this.x;
                             let dy = mouse.y - this.y;
@@ -1382,8 +1487,6 @@
                                 this.y -= directionY;
                             }
                         }
-
-                        // Original boundary and velocity logic
                         this.x += this.vx;
                         this.y += this.vy;
                         if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
@@ -1404,7 +1507,6 @@
                             const dx = particles[i].x - particles[j].x;
                             const dy = particles[i].y - particles[j].y;
                             const dist = Math.sqrt(dx * dx + dy * dy);
-
                             if (dist < maxDist && rgbColor) {
                                 ctx.beginPath();
                                 ctx.moveTo(particles[i].x, particles[i].y);
@@ -1447,7 +1549,7 @@
                 renderer.setPixelRatio(window.devicePixelRatio);
                 const canvas = renderer.domElement;
                 canvas.id = 'three-canvas';
-                gsap.set(canvas, { opacity: 0 }); // Start hidden
+                gsap.set(canvas, { opacity: 0 });
                 pinnedElement.appendChild(canvas);
                 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
                 threeScene.add(ambientLight);
@@ -1545,13 +1647,10 @@
                         const center = pinnedElement.getBoundingClientRect();
                         const labelEl = wrapper.getBoundingClientRect();
                         const svgRect = linesSVG.getBoundingClientRect();
-
                         const sx = center.left + center.width / 2 - svgRect.left;
                         const sy = center.top + center.height / 2 - svgRect.top;
-
                         const ex = labelEl.left + (parseFloat(data.positions[i].x) < 50 ? labelEl.width : 0) - svgRect.left;
                         const ey = labelEl.top + labelEl.height / 2 - svgRect.top;
-
                         const d = `M ${sx} ${sy} L ${ex} ${ey}`;
                         gsap.set(line, { attr: { d } });
                         line.style.strokeDasharray = line.getTotalLength();
@@ -1561,14 +1660,39 @@
                     setTimeout(updatePath, 100);
                     window.addEventListener('resize', updatePath);
 
-                    const initialLineColor = document.body.classList.contains('light')
-                        ? 'rgba(26, 26, 26, 0.4)' // Black for light theme
-                        : 'rgba(255, 255, 255, 0.4)'; // White for dark theme
+                    const initialLineColor = document.body.classList.contains('light') ? 'rgba(26, 26, 26, 0.4)' : 'rgba(255, 255, 255, 0.4)';
                     gsap.set(line, { attr: { 'stroke-width': 0.5, stroke: initialLineColor } });
                     linesSVG.appendChild(line);
                     group.lines.push(line);
                 });
                 return group;
+            };
+
+            const createCertificationGrid = (data) => {
+                const container = document.getElementById('certification-grid-container');
+                data.forEach(company => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'company-logo-wrapper';
+                    const logo = document.createElement('img');
+                    logo.src = company.logo;
+                    logo.alt = `${company.company} logo`;
+                    logo.className = 'company-logo';
+                    const list = document.createElement('ul');
+                    list.className = 'certificate-list';
+                    company.credentials.forEach(cred => {
+                        const item = document.createElement('li');
+                        const link = document.createElement('a');
+                        link.href = cred.url;
+                        link.textContent = cred.name;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        item.appendChild(link);
+                        list.appendChild(item);
+                    });
+                    wrapper.appendChild(logo);
+                    wrapper.appendChild(list);
+                    container.appendChild(wrapper);
+                });
             };
 
             // --- 5. GSAP SCROLL-DRIVEN ANIMATION ---
@@ -1577,11 +1701,11 @@
 
             const allSkillsCallouts = createCalloutElements(calloutData.allSkills);
             const projectCallouts = createCalloutElements(calloutData.projects);
-            const certificationCallouts = createCalloutElements(calloutData.certifications);
+
+            createCertificationGrid(calloutData.certifications);
 
             gsap.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'hidden' });
             gsap.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'hidden' });
-            gsap.set(certificationCallouts.labels.concat(certificationCallouts.lines), { visibility: 'hidden' });
 
 
             const sciFiCanvas = document.getElementById('sci-fi-canvas');
@@ -1595,7 +1719,6 @@
             const colorArcs = gsap.utils.toArray("#arc-1, #arc-2, #arc-3, #arc-4");
             const skillsTitle = document.getElementById('skills-title');
             const projectsTitle = document.getElementById('projects-title');
-            const certificationsTitle = document.getElementById('certifications-title');
 
             colorArcs.forEach(arc => {
                 const len = arc.getTotalLength();
@@ -1618,8 +1741,7 @@
                     onLeaveBack: () => {
                         if (backgroundAnimation) {
                             backgroundAnimation.stop();
-                            const ctx = backgroundCanvas.getContext('2d');
-                            ctx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+                            backgroundCanvas.getContext('2d').clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
                         }
                         sciFiAnimation = createPlexusAnimation(document.getElementById('sci-fi-canvas'), 80, 100, '#336699');
                     },
@@ -1636,8 +1758,7 @@
                 }
             });
 
-            // --- TIMELINE DEFINITIONS ---
-            tl.to(colorArcs, { strokeDashoffset: 0, duration: p(5), stagger: p(0.5) }, 0);
+            tl.to(colorArcs, { strokeDashoffset: 0, duration: p(4), stagger: p(0.5) }, 0);
 
             const circleSize = (pinnedElement.getBoundingClientRect().width / window.innerWidth) * 50;
             tl.to(sciFiCanvas, { opacity: 0, duration: p(0.2) }, p(0))
@@ -1664,9 +1785,8 @@
             tl.to(allSkillsCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, skillsEndTime);
             tl.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'hidden' }, skillsEndTime + p(0.5));
 
-            // --- Projects Callout Animation ---
             const projectsStartTime = p(2);
-            const projectsEndTime = p(5);
+            const projectsEndTime = p(4);
             tl.to(projectsTitle, { opacity: 1, x: 0, duration: p(0.5) }, projectsStartTime);
             tl.to(projectsTitle, { opacity: 0, x: -30, duration: p(0.5) }, projectsEndTime);
             tl.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'visible' }, projectsStartTime);
@@ -1676,34 +1796,23 @@
             tl.to(projectCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, projectsEndTime);
             tl.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'hidden' }, projectsEndTime + p(0.5));
 
-            // --- Certifications Callout Animation ---
-            const certsStartTime = p(5.1);
-            const certsEndTime = p(25);
-            tl.to(certificationsTitle, { opacity: 1, x: 0, duration: p(0.5) }, certsStartTime);
-            tl.to(certificationsTitle, { opacity: 0, x: -30, duration: p(0.5) }, certsEndTime);
-            tl.set(certificationCallouts.labels.concat(certificationCallouts.lines), { visibility: 'visible' }, certsStartTime);
-            tl.to(certificationCallouts.lines, { strokeDashoffset: 0, duration: p(1), stagger: 0.1 }, certsStartTime);
-            tl.to(certificationCallouts.labels, { opacity: 1, duration: p(1), stagger: 0.1 }, certsStartTime);
-            tl.to(certificationCallouts.labels, { opacity: 0, duration: p(0.5) }, certsEndTime);
-            tl.to(certificationCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, certsEndTime);
-            tl.set(certificationCallouts.labels.concat(certificationCallouts.lines), { visibility: 'hidden' }, certsEndTime + p(0.5));
-
-
             tl.to(threeCanvas, { opacity: 0, duration: p(0.1) }, p(4))
-                .to(svgStaggerDots, { opacity: 1, duration: p(0.1) }, p(4))
-                .from(gsap.utils.toArray('#svg-stagger-dots circle'), { scale: 0.1, stagger: { grid: 'auto', from: 'center', amount: p(0.8) }, duration: p(1), }, p(4));
+                .to(svgClockwork, { opacity: 1, duration: p(0.1) }, p(4))
+                .to(svgClockHand, { rotation: 1080, transformOrigin: '50% 50%', duration: p(1) }, p(4));
 
-            tl.to(svgStaggerDots, { opacity: 0, duration: p(0.1) }, p(5))
-                .to(svgClockwork, { opacity: 1, duration: p(0.1) }, p(5))
-                .to(svgClockHand, { rotation: 1080, transformOrigin: '50% 50%', duration: p(1) }, p(5));
+            tl.to(svgClockwork, { opacity: 0, duration: p(0.1) }, p(5))
+                .to(svgFinalPattern, { opacity: 1, duration: p(0.1) }, p(5))
+                .from(gsap.utils.toArray('#svg-final-pattern circle'), { scale: 0, stagger: { grid: 'auto', from: 'center', amount: p(0.8) }, duration: p(1), }, p(5));
 
-            tl.to(svgClockwork, { opacity: 0, duration: p(0.1) }, p(6))
-                .to(svgSprings, { opacity: 1, duration: p(0.1) }, p(6))
-                .to(svgSpringDots, { attr: { cx: (i) => 50 + 40 * Math.cos(i * (2 * Math.PI / numDots)), cy: (i) => 50 + 40 * Math.sin(i * (2 * Math.PI / numDots)), }, stagger: 0.05, duration: p(1), ease: 'elastic.out(1, 0.5)' }, p(6));
-
-            tl.to(svgSprings, { opacity: 0, duration: p(0.1) }, p(7))
-                .to(svgFinalPattern, { opacity: 1, duration: p(0.1) }, p(7))
-                .from(gsap.utils.toArray('#svg-final-pattern circle'), { scale: 0, stagger: { grid: 'auto', from: 'center', amount: p(0.8) }, duration: p(1), }, p(7));
+            // --- Standalone Certifications Section Animation ---
+            gsap.from("#certifications-title", {
+                scrollTrigger: { trigger: "#certifications", start: "top 80%", toggleActions: "play none none none" },
+                opacity: 0, y: 50, duration: 0.6
+            });
+            gsap.from(".company-logo-wrapper", {
+                scrollTrigger: { trigger: "#certification-grid-container", start: "top 85%", toggleActions: "play none none none" },
+                opacity: 0, scale: 0.5, y: 50, duration: 0.5, stagger: 0.1
+            });
 
             // --- Custom Scrollbar Logic ---
             const thumb = document.getElementById('custom-scrollbar-thumb');
@@ -1727,12 +1836,8 @@
                 onDrag: function () {
                     const progress = this.y / (track.clientHeight - this.clientHeight);
                     gsap.to(window, {
-                        scrollTo: {
-                            y: progress * (document.body.scrollHeight - window.innerHeight),
-                            autoKill: false
-                        },
-                        ease: 'none',
-                        overwrite: true
+                        scrollTo: { y: progress * (document.body.scrollHeight - window.innerHeight), autoKill: false },
+                        ease: 'none', overwrite: true
                     });
                 }
             });
@@ -1772,9 +1877,7 @@
                     messageElement.textContent = message;
                 }
 
-                if (messageId) {
-                    messageElement.id = messageId;
-                }
+                if (messageId) messageElement.id = messageId;
                 chatMessages.appendChild(messageElement);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             };
@@ -1787,7 +1890,7 @@
             };
 
             const getGeminiResponse = async (userInput) => {
-                const apiKey = "AIzaSyBV1BbY0zc4zWvx-iXj4MSLWQeRpud3lhM"; // IMPORTANT: Left blank intentionally. Canvas will provide one.
+                const apiKey = ""; // IMPORTANT: Left blank intentionally. Canvas will provide one.
                 if (!apiKey) {
                     return "I'm sorry, but my connection isn't configured. The developer needs to add an API key.";
                 }
@@ -1838,9 +1941,7 @@
                     const botMessage = await getGeminiResponse(userMessage);
 
                     const typingIndicator = document.getElementById(typingIndicatorId);
-                    if (typingIndicator) {
-                        chatMessages.removeChild(typingIndicator);
-                    }
+                    if (typingIndicator) chatMessages.removeChild(typingIndicator);
 
                     addMessage(botMessage, 'bot');
                     chatInput.disabled = false;
@@ -1864,13 +1965,10 @@
             });
 
             scrollToTopBtn.addEventListener('click', () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            // --- NEW: Typewriter Effect Logic ---
+            // --- Typewriter Effect Logic ---
             const typewriterText = document.getElementById('typewriter-text');
             if (typewriterText) {
                 const words = ["Data Science Expert.", "AI & Machine Learning Engineer.", "Problem Solver."];
@@ -1881,29 +1979,24 @@
                     let typeSpeed = isDeleting ? 50 : 150;
 
                     if (isDeleting) {
-                        // If deleting, shorten the substring
                         typewriterText.textContent = currentWord.substring(0, j - 1);
                         j--;
                         if (j === 0) {
-                            // Finished deleting, switch to the next word
                             isDeleting = false;
-                            i = (i + 1) % words.length; // Loop back to the start
+                            i = (i + 1) % words.length;
                         }
                     } else {
-                        // If typing, lengthen the substring
                         typewriterText.textContent = currentWord.substring(0, j + 1);
                         j++;
                         if (j === currentWord.length) {
-                            // Finished typing, pause, then start deleting
                             isDeleting = true;
-                            typeSpeed = 2000; // Pause at the end of the word
+                            typeSpeed = 2000;
                         }
                     }
                     setTimeout(type, typeSpeed);
                 }
-                type(); // Start the animation
+                type();
 
-                // Manages the blinking cursor effect
                 const cursor = document.getElementById('typewriter-cursor');
                 if (cursor) {
                     setInterval(() => {
@@ -1912,34 +2005,30 @@
                 }
             }
 
-            // --- NEW: Snow Effect Logic ---
+            // --- Snow Effect Logic ---
             const snowCanvas = document.getElementById('snow-canvas');
             if (snowCanvas) {
                 const ctx = snowCanvas.getContext('2d');
-                let width = snowCanvas.parentElement.offsetWidth;
-                let height = snowCanvas.parentElement.offsetHeight;
-                snowCanvas.width = width;
-                snowCanvas.height = height;
+                let width, height, flakes = [], numFlakes;
 
-                const flakes = [];
-                const numFlakes = Math.min(200, width / 4); // Adjust number of flakes based on width
-
-                // Recalculate canvas size and flakes on window resize
-                window.addEventListener('resize', () => {
+                function setupSnow() {
                     width = snowCanvas.parentElement.offsetWidth;
                     height = snowCanvas.parentElement.offsetHeight;
                     snowCanvas.width = width;
                     snowCanvas.height = height;
-                    createFlakes(); // Re-create flakes for the new size
-                }, false);
+                    numFlakes = Math.min(200, width / 4);
+                    createFlakes();
+                }
+
+                window.addEventListener('resize', setupSnow, false);
 
                 function createFlakes() {
-                    flakes.length = 0; // Clear existing flakes
+                    flakes.length = 0;
                     for (let i = 0; i < numFlakes; i++) {
                         flakes.push({
                             x: Math.random() * width,
                             y: Math.random() * height,
-                            radius: Math.random() * 2.5 + 1, // Flake size
+                            radius: Math.random() * 2.5 + 1,
                             density: Math.random() * numFlakes,
                         });
                     }
@@ -1949,11 +2038,10 @@
                     ctx.clearRect(0, 0, width, height);
                     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                     ctx.beginPath();
-                    for (let i = 0; i < numFlakes; i++) {
-                        const f = flakes[i];
+                    flakes.forEach(f => {
                         ctx.moveTo(f.x, f.y);
                         ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2, true);
-                    }
+                    });
                     ctx.fill();
                     moveFlakes();
                 }
@@ -1961,22 +2049,18 @@
                 let angle = 0;
                 function moveFlakes() {
                     angle += 0.01;
-                    for (let i = 0; i < numFlakes; i++) {
-                        const f = flakes[i];
-                        // Update Y position for falling effect
+                    flakes.forEach(f => {
                         f.y += (Math.pow(f.density, 2) / 10000) + 1;
-                        // Update X position for gentle wind effect
                         f.x += Math.sin(angle) * 0.5;
-
-                        // Reset flake when it goes off-screen
                         if (f.y > height + 10) {
-                            flakes[i] = { x: Math.random() * width, y: -10, radius: f.radius, density: f.density };
+                            f.x = Math.random() * width;
+                            f.y = -10;
                         }
-                    }
+                    });
                 }
 
-                createFlakes();
-                setInterval(drawFlakes, 30); // Run the animation loop
+                setupSnow();
+                setInterval(drawFlakes, 30);
             }
 
             // --- EmailJS Contact Form Logic ---
@@ -1995,18 +2079,10 @@
                 submitButton.textContent = 'Sending...';
                 formStatus.textContent = '';
 
-                // --- IMPORTANT ---
-                // This setup requires two different templates in your EmailJS account.
-                // 1. A template to send a notification TO YOU (the site owner).
-                // 2. A template to send an auto-reply confirmation TO THE USER.
-
                 const serviceId = 'service_ouxgpae';
-                // Template ID for the email sent TO YOU
                 const templateIdForOwner = 'template_0lqjlra';
-                // Template ID for the auto-reply email sent TO THE USER
                 const templateIdForUser = 'template_7vfx7sn';
 
-                // We'll send both emails and show a success message only if both are successful.
                 Promise.all([
                     emailjs.sendForm(serviceId, templateIdForOwner, this),
                     emailjs.sendForm(serviceId, templateIdForUser, this)
@@ -2031,247 +2107,131 @@
     <script>
         // Game implementation
         const gameCanvas = document.getElementById('game-canvas');
-        const gameCtx = gameCanvas.getContext('2d');
+        if (gameCanvas) {
+            const gameCtx = gameCanvas.getContext('2d');
+            const DRONE_WIDTH = 38;
+            const DRONE_HEIGHT = 20;
+            const GROUND_Y = gameCanvas.height - 20;
 
-        const DRONE_WIDTH = 38;
-        const DRONE_HEIGHT = 20;
-        const GROUND_Y = gameCanvas.height - 20;
+            let score = 0;
+            let highScore = 0;
+            let gameSpeed = 5;
+            let isPlaying = false;
+            let isGameOver = true;
+            let gameAnimationFrameId;
 
-        let score = 0;
-        let highScore = 0;
-        let gameSpeed = 5;
-        let isPlaying = false;
-        let isGameOver = true; // Start in a "game over" state
-        let gameAnimationFrameId;
-
-        class Drone {
-            constructor() {
-                this.x = 50;
-                this.y = GROUND_Y - DRONE_HEIGHT;
-                this.width = DRONE_WIDTH;
-                this.height = DRONE_HEIGHT;
-                this.velocityY = 0;
-                this.isAscending = false;
-                this.ascendPower = -10;
-                this.gravity = 0.4;
-            }
-
-            draw() {
-                const droneColor = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
-                gameCtx.fillStyle = droneColor;
-                // Main body
-                gameCtx.fillRect(this.x, this.y + 5, this.width, this.height - 10);
-                // Propellers
-                gameCtx.fillRect(this.x + 2, this.y, 10, 5);
-                gameCtx.fillRect(this.x + this.width - 12, this.y, 10, 5);
-                // "Eye" or sensor - using portfolio accent color
-                gameCtx.fillStyle = '#F4B400';
-                gameCtx.beginPath();
-                gameCtx.arc(this.x + this.width / 2, this.y + 12, 4, 0, Math.PI * 2);
-                gameCtx.fill();
-            }
-
-            ascend() {
-                if (!this.isAscending && isPlaying) {
-                    this.isAscending = true;
-                    this.velocityY = this.ascendPower;
+            class Drone {
+                constructor() {
+                    this.x = 50; this.y = GROUND_Y - DRONE_HEIGHT;
+                    this.width = DRONE_WIDTH; this.height = DRONE_HEIGHT;
+                    this.velocityY = 0; this.isAscending = false;
+                    this.ascendPower = -10; this.gravity = 0.4;
                 }
-            }
-
-            update() {
-                if (this.isAscending) {
-                    this.y += this.velocityY;
-                    this.velocityY += this.gravity;
-                    if (this.y > GROUND_Y - this.height) {
-                        this.y = GROUND_Y - this.height;
-                        this.isAscending = false;
-                        this.velocityY = 0;
+                draw() {
+                    const droneColor = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
+                    gameCtx.fillStyle = droneColor;
+                    gameCtx.fillRect(this.x, this.y + 5, this.width, this.height - 10);
+                    gameCtx.fillRect(this.x + 2, this.y, 10, 5);
+                    gameCtx.fillRect(this.x + this.width - 12, this.y, 10, 5);
+                    gameCtx.fillStyle = '#F4B400';
+                    gameCtx.beginPath();
+                    gameCtx.arc(this.x + this.width / 2, this.y + 12, 4, 0, Math.PI * 2);
+                    gameCtx.fill();
+                }
+                ascend() { if (!this.isAscending && isPlaying) { this.isAscending = true; this.velocityY = this.ascendPower; } }
+                update() {
+                    if (this.isAscending) {
+                        this.y += this.velocityY;
+                        this.velocityY += this.gravity;
+                        if (this.y > GROUND_Y - this.height) { this.y = GROUND_Y - this.height; this.isAscending = false; this.velocityY = 0; }
                     }
+                    this.draw();
                 }
-                this.draw();
             }
-        }
-
-        class Obstacle {
-            constructor(x, width, height) {
-                this.x = x;
-                this.y = GROUND_Y - height;
-                this.width = width;
-                this.height = height;
-            }
-
-            draw() {
-                const obstacleColor = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
-                gameCtx.fillStyle = obstacleColor;
-                gameCtx.fillRect(this.x, this.y, this.width, this.height);
-            }
-
-            update() {
-                this.x -= gameSpeed;
-                this.draw();
-            }
-        }
-
-        let drone = new Drone();
-        let obstacles = [];
-
-        function spawnObstacle() {
-            const obstacleType = Math.random() > 0.3 ? 'column' : 'flyer';
-            let x = gameCanvas.width;
-            let width, height;
-
-            if (obstacleType === 'column') {
-                const size = Math.floor(Math.random() * 3) + 1;
-                width = 15 * size;
-                height = 35;
-            } else { // Flyer
-                width = 40;
-                height = 20;
-            }
-
-            const newObstacle = new Obstacle(x, width, height);
-            if (obstacleType === 'flyer') {
-                newObstacle.y = GROUND_Y - height - (Math.random() > 0.5 ? 25 : 0);
-            }
-
-            obstacles.push(newObstacle);
-        }
-
-        let obstacleSpawnTimer = 0;
-        let nextObstacleSpawnTime = 100;
-
-        function updateScore() {
-            score++;
-            if (score > highScore) {
-                highScore = score;
-            }
-            if (score % 100 === 0) {
-                gameSpeed += 0.5;
-            }
-        }
-
-        function drawScore() {
-            gameCtx.fillStyle = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
-            gameCtx.font = "bold 16px 'Inter', sans-serif";
-            gameCtx.textAlign = 'left';
-            const scoreText = `HI ${String(highScore).padStart(5, '0')} ${String(Math.floor(score / 10)).padStart(5, '0')}`;
-            gameCtx.fillText(scoreText, 20, 30);
-        }
-
-        function drawGround() {
-            gameCtx.beginPath();
-            gameCtx.moveTo(0, GROUND_Y);
-            gameCtx.lineTo(gameCanvas.width, GROUND_Y);
-            const groundColor = document.body.classList.contains('light') ? 'rgba(26, 26, 26, 0.5)' : 'rgba(240, 240, 240, 0.5)';
-            gameCtx.strokeStyle = groundColor;
-            gameCtx.lineWidth = 2;
-            gameCtx.stroke();
-        }
-
-        function detectCollision(a, b) {
-            return a.x < b.x + b.width &&
-                a.x + a.width > b.x &&
-                a.y < b.y + b.height &&
-                a.y + a.height > b.y;
-        }
-
-        function gameLoop() {
-            if (isGameOver) return;
-            gameAnimationFrameId = requestAnimationFrame(gameLoop);
-
-            gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-
-            drawGround();
-
-            drone.update();
-
-            obstacleSpawnTimer++;
-            if (obstacleSpawnTimer >= nextObstacleSpawnTime) {
-                spawnObstacle();
-                obstacleSpawnTimer = 0;
-                nextObstacleSpawnTime = Math.floor(Math.random() * (120 - 60 + 1)) + 60;
-            }
-
-            obstacles.forEach((obstacle, index) => {
-                obstacle.update();
-                if (obstacle.x + obstacle.width < 0) {
-                    setTimeout(() => obstacles.splice(index, 1), 0);
+            class Obstacle {
+                constructor(x, width, height) { this.x = x; this.y = GROUND_Y - height; this.width = width; this.height = height; }
+                draw() {
+                    const obstacleColor = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
+                    gameCtx.fillStyle = obstacleColor; gameCtx.fillRect(this.x, this.y, this.width, this.height);
                 }
-
-                if (detectCollision(drone, obstacle)) {
-                    endGame();
+                update() { this.x -= gameSpeed; this.draw(); }
+            }
+            let drone = new Drone();
+            let obstacles = [];
+            let obstacleSpawnTimer = 0, nextObstacleSpawnTime = 100;
+            function spawnObstacle() {
+                const isFlyer = Math.random() < 0.3;
+                let width = isFlyer ? 40 : (15 * (Math.floor(Math.random() * 3) + 1));
+                let height = isFlyer ? 20 : 35;
+                const newObstacle = new Obstacle(gameCanvas.width, width, height);
+                if (isFlyer) newObstacle.y = GROUND_Y - height - (Math.random() > 0.5 ? 25 : 0);
+                obstacles.push(newObstacle);
+            }
+            function updateScore() {
+                score++;
+                if (score > highScore) highScore = score;
+                if (score % 100 === 0) gameSpeed += 0.5;
+            }
+            function drawScore() {
+                gameCtx.fillStyle = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
+                gameCtx.font = "bold 16px 'Inter', sans-serif";
+                gameCtx.textAlign = 'left';
+                const scoreText = `HI ${String(highScore).padStart(5, '0')} ${String(Math.floor(score / 10)).padStart(5, '0')}`;
+                gameCtx.fillText(scoreText, 20, 30);
+            }
+            function drawGround() {
+                gameCtx.beginPath();
+                gameCtx.moveTo(0, GROUND_Y);
+                gameCtx.lineTo(gameCanvas.width, GROUND_Y);
+                gameCtx.strokeStyle = document.body.classList.contains('light') ? 'rgba(26, 26, 26, 0.5)' : 'rgba(240, 240, 240, 0.5)';
+                gameCtx.lineWidth = 2;
+                gameCtx.stroke();
+            }
+            function detectCollision(a, b) { return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y; }
+            function gameLoop() {
+                if (isGameOver) return;
+                gameAnimationFrameId = requestAnimationFrame(gameLoop);
+                gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+                drawGround();
+                drone.update();
+                obstacleSpawnTimer++;
+                if (obstacleSpawnTimer >= nextObstacleSpawnTime) {
+                    spawnObstacle();
+                    obstacleSpawnTimer = 0;
+                    nextObstacleSpawnTime = Math.floor(Math.random() * 61) + 60;
                 }
-            });
-
-            updateScore();
-            drawScore();
-        }
-
-        function startGame() {
-            if (isPlaying) return;
-            if (isGameOver) resetGame();
-
-            isPlaying = true;
-            isGameOver = false;
-            gameLoop();
-        }
-
-        function endGame() {
-            isPlaying = false;
-            isGameOver = true;
-            cancelAnimationFrame(gameAnimationFrameId);
-        }
-
-        function resetGame() {
-            score = 0;
-            gameSpeed = 5;
-            obstacles = [];
-            drone = new Drone();
-            isGameOver = false;
-        }
-
-        function handleInput(e) {
-            if (e.code === 'Space' || e.code === 'ArrowUp') {
-                e.preventDefault();
-                if (!isPlaying) {
-                    startGame();
+                obstacles.forEach((obstacle, index) => {
+                    obstacle.update();
+                    if (obstacle.x + obstacle.width < 0) setTimeout(() => obstacles.splice(index, 1), 0);
+                    if (detectCollision(drone, obstacle)) endGame();
+                });
+                updateScore();
+                drawScore();
+            }
+            function startGame() {
+                if (isPlaying) return;
+                if (isGameOver) resetGame();
+                isPlaying = true; isGameOver = false;
+                gameLoop();
+            }
+            function endGame() { isPlaying = false; isGameOver = true; cancelAnimationFrame(gameAnimationFrameId); }
+            function resetGame() { score = 0; gameSpeed = 5; obstacles = []; drone = new Drone(); isGameOver = false; }
+            function handleInput(e) {
+                if (e.code === 'Space' || e.code === 'ArrowUp') {
+                    e.preventDefault(); if (!isPlaying) startGame(); drone.ascend();
                 }
-                drone.ascend();
             }
+            gameCanvas.addEventListener('keydown', handleInput);
+            gameCanvas.addEventListener('mousedown', () => { if (!isPlaying) startGame(); drone.ascend(); });
+            gameCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); if (!isPlaying) startGame(); drone.ascend(); });
+            function initGame() {
+                gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+                drawGround(); drone.draw(); drawScore();
+            }
+            document.getElementById('theme-toggle').addEventListener('click', () => { if (!isPlaying) setTimeout(initGame, 10); });
+            initGame();
         }
-
-        gameCanvas.addEventListener('keydown', handleInput);
-        gameCanvas.addEventListener('mousedown', () => {
-            if (!isPlaying) {
-                startGame();
-            }
-            drone.ascend();
-        });
-        gameCanvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (!isPlaying) {
-                startGame();
-            }
-            drone.ascend();
-        });
-
-        function initGame() {
-            gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-            drawGround();
-            drone.draw();
-            drawScore();
-        }
-
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            // Redraw the game to update colors if it's not currently playing
-            if (!isPlaying) {
-                setTimeout(initGame, 10);
-            }
-        });
-
-        initGame();
     </script>
 </body>
 
 </html>
-
