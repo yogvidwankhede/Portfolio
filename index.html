@@ -17,13 +17,26 @@
         rel="stylesheet">
     <!-- Font for boot animation -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- Font for new hero section -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-5X97TPPD');</script>
+    <!-- End Google Tag Manager -->
 
     <style>
         /* Custom styles for the dark theme and layout */
         body {
             background-color: #1a1a1a;
             color: #f0f0f0;
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             overflow-x: hidden;
             scroll-behavior: smooth;
             scrollbar-width: none;
@@ -58,6 +71,53 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
+
+        /* --- New Hero Section Styling --- */
+        #intro-hero {
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            /* Default dark theme background */
+            background-image: url('https://raw.githubusercontent.com/yogvidwankhede/portfolio/main/images/yogvid2.jpg');
+        }
+
+        body.light #intro-hero {
+            /* Light theme background */
+            background-image: url('https://raw.githubusercontent.com/yogvidwankhede/portfolio/main/images/yogvid1.jpg');
+        }
+
+        #snow-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        #intro-hero h1,
+        #intro-hero p,
+        #intro-hero #typewriter-text {
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        body.light #intro-hero h1,
+        body.light #intro-hero p {
+            color: #1f2937;
+        }
+
+        body.light #intro-hero .text-gray-400 {
+            color: #4b5563;
+        }
+
+        body.light #typewriter-cursor {
+            border-color: #1f2937;
+        }
+
+        /* --- End of New Hero Section Styling --- */
+
 
         #background-canvas {
             position: fixed;
@@ -689,8 +749,13 @@
     </style>
 </head>
 
-<body class="antialiased loading">
+<body class="antialiased loading light">
 
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5X97TPPD" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <!-- === Boot Animation Section === -->
     <section id="boot-animation">
         <div id="boot-text-container">
@@ -756,34 +821,23 @@
     </header>
 
     <main class="relative z-10">
-        <!-- ✨ Add this block inside <main class="relative z-10">, just BEFORE the current
-             <section id="hero" ...>  -->
 
+        <!-- === NEW HERO SECTION === -->
         <section id="intro-hero"
-            class="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-20">
-            <!-- Image side -->
-            <div class="md:w-1/2 flex justify-center md:justify-end md:pr-12 mb-10 md:mb-0">
-                <div class="flex justify-center">
-                    <div class="bg-gradient-to-b from-gray-800/60 to-gray-900/80 
-                              p-4 rounded-xl shadow-xl max-w-sm">
-                        <img src="https://raw.githubusercontent.com/yogvidwankhede/portfolio/main/images/yogvid.jpg"
-                            alt="Yogvid Wankhede" class="w-full h-auto rounded-lg border border-gray-700">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Text side -->
-            <div class="md:w-1/2 text-center md:text-left space-y-6">
+            class="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-20 relative overflow-hidden">
+            <canvas id="snow-canvas"></canvas>
+            <!-- Text content on the left -->
+            <div class="md:w-1/2 text-center md:text-left space-y-6 relative z-10">
                 <p class="uppercase tracking-widest text-gray-400 text-sm">
                     Welcome to my world
                 </p>
 
-                <h1 class="text-3xl md:text-5xl">
+                <h1 class="text-3xl md:text-5xl font-bold">
                     Hi, I’m <span class="text-[#336699]">Yogvid Wankhede</span>
                 </h1>
 
                 <!-- Typing animation -->
-                <div class="relative h-10 mb-4 text-lg md:text-2xl font-heading">
+                <div class="relative h-10 mb-4 text-lg md:text-2xl">
                     <span id="typewriter-text" class="whitespace-nowrap"></span>
                     <span id="typewriter-cursor" class="border-l-2 border-gray-400"></span>
                 </div>
@@ -796,9 +850,9 @@
                 </p>
 
                 <div class="flex justify-center md:justify-start space-x-4 pt-4">
-                    <a href="#portfolio"
+                    <a href="#pinned-container"
                         class="bg-[#336699] hover:bg-[#29527a] text-white px-6 py-2 rounded-full transition">
-                        View Portfolio
+                        View Skills
                     </a>
                     <a href="#contact"
                         class="border border-[#336699] hover:bg-[#336699] hover:text-white px-6 py-2 rounded-full transition">
@@ -806,22 +860,10 @@
                     </a>
                 </div>
             </div>
-
+            <!-- Empty div to push content to the left on desktop -->
+            <div class="md:w-1/2"></div>
         </section>
-
-        <!-- Place this small CSS either in the <head> <style> or your CSS file -->
-        <style>
-            /* Blinking cursor animation */
-            @keyframes blink {
-                50% {
-                    border-color: transparent;
-                }
-            }
-
-            #typewriter-cursor {
-                animation: blink 0.7s step-end infinite;
-            }
-        </style>
+        <!-- === END OF NEW HERO SECTION === -->
 
 
         <h2 id="skills-title" class="text-3xl fixed top-20 left-20 text-white opacity-0 z-20"
@@ -1057,14 +1099,14 @@
 
 
             // Theme switcher logic
-            if (localStorage.getItem('color-theme') === 'light') {
-                lightIcon.classList.remove('hidden');
-                darkIcon.classList.add('hidden');
-                bodyEl.classList.add('light');
-            } else {
+            if (localStorage.getItem('color-theme') === 'dark') {
                 lightIcon.classList.add('hidden');
                 darkIcon.classList.remove('hidden');
                 bodyEl.classList.remove('light');
+            } else {
+                lightIcon.classList.remove('hidden');
+                darkIcon.classList.add('hidden');
+                bodyEl.classList.add('light');
             }
 
             themeToggleBtn.addEventListener('click', function () {
@@ -1168,22 +1210,85 @@
                 },
                 certifications: {
                     labels: [
+                        // Certifications
                         "Google Advanced Data Analytics Professional",
                         "DeepLearning.AI TensorFlow Developer",
                         "Python 3 Programming",
-                        "Microsoft 365 Fundamentals"
+                        "Microsoft 365 Fundamentals",
+
+                        // Data Job Simulations
+                        "BCG - Data Science Job Simulation",
+                        "BCG - GenAI Job Simulation",
+                        "Deloitte Australia - Data Analytics Job Simulation",
+                        "EAB - GenAI for Proposal Generation Job Simulation",
+                        "J.P. Morgan - Quantitative Research Job Simulation",
+                        "Lloyds Banking Group - Data Science Job Simulation",
+                        "Quantium - Data Analytics Job Simulation",
+                        "Tata - Cybersecurity Analyst Job Simulation",
+                        "Tata - Data Visualisation: Empowering Business with Effective Insights Job Simulation",
+                        "Tata - GenAI Powered Data Analytics Job Simulation",
+
+                        // Software Job Simulations
+                        "Datacom - Automation Job Simulation",
+                        "Electronic Arts - Software Engineering Job Simulation",
+                        "J.P. Morgan - Software Engineering Job Simulation",
+                        "Johnson and Johnson - Robotics and Controls Job Simulation",
+                        "Mastercard - Cybersecurity Job Simulation",
+                        "Walmart USA - Advanced Software Engineering Job Simulation",
+
+                        // Other
+                        "Forage Academy - Branding & Design Job Simulation"
                     ],
                     urls: [
                         "https://www.coursera.org/account/accomplishments/professional-cert/2F66GDKEUNLK", // Replace with your certification link
                         "https://www.coursera.org/account/accomplishments/professional-cert/PAUSSXCRK9YL", // Replace with your certification link
                         "https://drive.google.com/file/d/169OETqm19aT5-wTkfsaMtckLV9ipf5w4/view?usp=sharing", // Replace with your certification link
-                        "https://www.coursera.org/account/accomplishments/specialization/2EUL5E7W7JNU"  // Replace with your certification link
+                        "https://www.coursera.org/account/accomplishments/specialization/2EUL5E7W7JNU",
+                        "#",  // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#", // Replace with your certification link
+                        "#" // Replace with your certification link
                     ],
                     positions: [
-                        { x: '78%', y: '25%' }, // top-right
-                        { x: '86%', y: '45%' }, // mid-upper-right
-                        { x: '74%', y: '60%' }, // mid-lower (pulled a bit left for balance)
-                        { x: '82%', y: '78%' }  // bottom-right
+                        // Outer Ring (12 positions)
+                        { x: '50%', y: '15%' },   // top-center
+                        { x: '75%', y: '15%' },  // top-right-quarter
+                        { x: '90%', y: '35%' },  // upper-right
+                        { x: '95%', y: '50%' },  // right-center
+                        { x: '90%', y: '65%' },  // lower-right
+                        { x: '75%', y: '85%' },  // bottom-right-quarter
+                        { x: '50%', y: '95%' },  // bottom-center
+                        { x: '25%', y: '85%' },  // bottom-left-quarter
+                        { x: '10%', y: '65%' },  // lower-left
+                        { x: '5%', y: '50%' },  // left-center
+                        { x: '10%', y: '35%' },  // upper-left
+                        { x: '25%', y: '15%' },  // top-left-quarter
+
+                        // Inner Ring (8 positions)
+                        { x: '50%', y: '25%' },  // inner-top
+                        { x: '68%', y: '32%' },  // inner-top-right
+                        { x: '75%', y: '50%' },  // inner-right
+                        { x: '68%', y: '68%' },  // inner-bottom-right
+                        { x: '50%', y: '75%' },  // inner-bottom
+                        { x: '32%', y: '68%' },  // inner-bottom-left
+                        { x: '25%', y: '50%' },  // inner-left
+                        { x: '32%', y: '32%' },  // inner-top-left
+
+                        // Center (1 position)
+                        { x: '50%', y: '50%' }   // absolute-center
                     ]
 
                 }
@@ -1573,7 +1678,7 @@
 
             // --- Certifications Callout Animation ---
             const certsStartTime = p(5.1);
-            const certsEndTime = p(7.5);
+            const certsEndTime = p(25);
             tl.to(certificationsTitle, { opacity: 1, x: 0, duration: p(0.5) }, certsStartTime);
             tl.to(certificationsTitle, { opacity: 0, x: -30, duration: p(0.5) }, certsEndTime);
             tl.set(certificationCallouts.labels.concat(certificationCallouts.lines), { visibility: 'visible' }, certsStartTime);
@@ -1765,41 +1870,114 @@
                 });
             });
 
-            // --- Typewriter Animation Logic ---
-            const typewriterTextElement = document.getElementById('typewriter-text');
-            const words = ["Data Science Expert.", "AI & Machine Learning Engineer.", "Problem Solver."];
-            let wordIndex = 0;
-            let charIndex = 0;
-            let isDeleting = false;
+            // --- NEW: Typewriter Effect Logic ---
+            const typewriterText = document.getElementById('typewriter-text');
+            if (typewriterText) {
+                const words = ["Data Science Expert.", "AI & Machine Learning Engineer.", "Problem Solver."];
+                let i = 0, j = 0, currentWord = "", isDeleting = false;
 
-            function type() {
-                const currentWord = words[wordIndex];
+                function type() {
+                    currentWord = words[i];
+                    let typeSpeed = isDeleting ? 50 : 150;
 
-                if (isDeleting) {
-                    // Deleting characters
-                    typewriterTextElement.textContent = currentWord.substring(0, charIndex - 1);
-                    charIndex--;
-                    if (charIndex === 0) {
-                        isDeleting = false;
-                        wordIndex = (wordIndex + 1) % words.length;
-                        setTimeout(type, 500); // Pause before typing next word
+                    if (isDeleting) {
+                        // If deleting, shorten the substring
+                        typewriterText.textContent = currentWord.substring(0, j - 1);
+                        j--;
+                        if (j === 0) {
+                            // Finished deleting, switch to the next word
+                            isDeleting = false;
+                            i = (i + 1) % words.length; // Loop back to the start
+                        }
                     } else {
-                        setTimeout(type, 50); // Deleting speed
+                        // If typing, lengthen the substring
+                        typewriterText.textContent = currentWord.substring(0, j + 1);
+                        j++;
+                        if (j === currentWord.length) {
+                            // Finished typing, pause, then start deleting
+                            isDeleting = true;
+                            typeSpeed = 2000; // Pause at the end of the word
+                        }
                     }
-                } else {
-                    // Typing characters
-                    typewriterTextElement.textContent = currentWord.substring(0, charIndex + 1);
-                    charIndex++;
-                    if (charIndex === currentWord.length) {
-                        isDeleting = true;
-                        setTimeout(type, 2000); // Pause after typing word
-                    } else {
-                        setTimeout(type, 100); // Typing speed
-                    }
+                    setTimeout(type, typeSpeed);
+                }
+                type(); // Start the animation
+
+                // Manages the blinking cursor effect
+                const cursor = document.getElementById('typewriter-cursor');
+                if (cursor) {
+                    setInterval(() => {
+                        cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+                    }, 500);
                 }
             }
 
-            type(); // Start the animation
+            // --- NEW: Snow Effect Logic ---
+            const snowCanvas = document.getElementById('snow-canvas');
+            if (snowCanvas) {
+                const ctx = snowCanvas.getContext('2d');
+                let width = snowCanvas.parentElement.offsetWidth;
+                let height = snowCanvas.parentElement.offsetHeight;
+                snowCanvas.width = width;
+                snowCanvas.height = height;
+
+                const flakes = [];
+                const numFlakes = Math.min(200, width / 4); // Adjust number of flakes based on width
+
+                // Recalculate canvas size and flakes on window resize
+                window.addEventListener('resize', () => {
+                    width = snowCanvas.parentElement.offsetWidth;
+                    height = snowCanvas.parentElement.offsetHeight;
+                    snowCanvas.width = width;
+                    snowCanvas.height = height;
+                    createFlakes(); // Re-create flakes for the new size
+                }, false);
+
+                function createFlakes() {
+                    flakes.length = 0; // Clear existing flakes
+                    for (let i = 0; i < numFlakes; i++) {
+                        flakes.push({
+                            x: Math.random() * width,
+                            y: Math.random() * height,
+                            radius: Math.random() * 2.5 + 1, // Flake size
+                            density: Math.random() * numFlakes,
+                        });
+                    }
+                }
+
+                function drawFlakes() {
+                    ctx.clearRect(0, 0, width, height);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.beginPath();
+                    for (let i = 0; i < numFlakes; i++) {
+                        const f = flakes[i];
+                        ctx.moveTo(f.x, f.y);
+                        ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2, true);
+                    }
+                    ctx.fill();
+                    moveFlakes();
+                }
+
+                let angle = 0;
+                function moveFlakes() {
+                    angle += 0.01;
+                    for (let i = 0; i < numFlakes; i++) {
+                        const f = flakes[i];
+                        // Update Y position for falling effect
+                        f.y += (Math.pow(f.density, 2) / 10000) + 1;
+                        // Update X position for gentle wind effect
+                        f.x += Math.sin(angle) * 0.5;
+
+                        // Reset flake when it goes off-screen
+                        if (f.y > height + 10) {
+                            flakes[i] = { x: Math.random() * width, y: -10, radius: f.radius, density: f.density };
+                        }
+                    }
+                }
+
+                createFlakes();
+                setInterval(drawFlakes, 30); // Run the animation loop
+            }
 
             // --- EmailJS Contact Form Logic ---
             (function () {
