@@ -197,55 +197,56 @@
             margin: 0 5%;
         }
 
-        /* --- Chatbot Styles --- */
-        #chatbot-toggle {
+        /* --- Roaming Bot Styles (NEW) --- */
+        #roaming-bot {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 64px;
-            height: 64px;
-            background: radial-gradient(circle, #4a4a52 0%, #2a2a30 100%);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 60px;
+            z-index: 9999;
             cursor: pointer;
-            border: 2px solid rgba(0, 255, 255, 0.3);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.5);
-            animation: bobbing 3s infinite ease-in-out;
-            z-index: 1000;
+            will-change: transform;
+            opacity: 0.51;
         }
 
-        @keyframes bobbing {
+        #roaming-bot .bot-body {
+            width: 100%;
+            height: 100%;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        #roaming-bot .chatbot-main-color {
+            stroke: white;
+            fill: white;
+        }
+
+        #roaming-bot .chatbot-accent-color {
+            fill: #1a1a1a;
+        }
+
+        body.light #roaming-bot .chatbot-main-color {
+            stroke: black;
+            fill: black;
+        }
+
+        body.light #roaming-bot .chatbot-accent-color {
+            fill: #f0f2f5;
+        }
+
+        @keyframes float {
 
             0%,
             100% {
-                transform: translateY(0);
+                transform: translateY(0px);
             }
 
             50% {
-                transform: translateY(-10px);
+                transform: translateY(-15px);
             }
         }
 
-        #chatbot-toggle .drone-eye {
-            width: 32px;
-            height: 32px;
-            animation: eye-glow 2s infinite alternate ease-in-out;
-        }
-
-        @keyframes eye-glow {
-            from {
-                filter: drop-shadow(0 0 3px #00FFFF);
-                transform: scale(1);
-            }
-
-            to {
-                filter: drop-shadow(0 0 10px #00FFFF);
-                transform: scale(1.05);
-            }
-        }
-
+        /* --- Chatbot Styles (MODIFIED) --- */
         .typing-dot {
             display: inline-block;
             width: 8px;
@@ -256,20 +257,24 @@
 
         #chat-window {
             position: fixed;
-            bottom: 7.5rem;
-            right: 2rem;
             width: 350px;
             height: 500px;
             opacity: 0;
             transform: translateY(20px) scale(0.95);
             transition: opacity 0.3s ease, transform 0.3s ease;
-            z-index: 999;
-            transform-origin: bottom right;
+            z-index: 9998;
+            /* Below bot */
+            pointer-events: none;
+            /* Can't interact when hidden */
+            display: flex;
+            flex-direction: column;
         }
 
         #chat-window.open {
             opacity: 1;
             transform: translateY(0) scale(1);
+            pointer-events: auto;
+            /* Can interact when open */
         }
 
         #chat-messages {
@@ -746,13 +751,31 @@
             border-color: rgba(0, 0, 0, 0.1);
         }
 
+        /* --- HUD THEME STYLES --- */
+        .hud-tick-mark {
+            stroke: #888;
+        }
+
+        body.light .hud-tick-mark {
+            stroke: #1a1a1a;
+        }
+
+        .hud-clock-tick {
+            stroke: #f0f0f0;
+        }
+
+        body.light .hud-clock-tick {
+            stroke: #1a1a1a;
+        }
+
         /* --- Boot Animation --- */
         body.loading main,
         body.loading header,
         body.loading footer,
         body.loading #custom-scrollbar,
         body.loading #dino-game-container,
-        body.loading #chatbot-toggle,
+        body.loading #roaming-bot,
+        /* MODIFIED */
         body.loading #chat-window,
         body.loading #scrollToTopBtn {
             visibility: hidden;
@@ -1108,21 +1131,48 @@
         <div id="game-over-message" class="game-message"></div>
     </div>
 
-    <div id="chatbot-toggle">
-        <svg class="drone-eye" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <!-- Roaming Bot HTML (NEW) -->
+    <div id="roaming-bot">
+        <svg class="bot-body" viewBox="0 0 100 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g filter="url(#filter0_d_101_2)">
+                <path
+                    d="M10 55C10 44.2267 15.6983 34.5028 24.3853 28.5281C33.0722 22.5534 44.5883 21.219 55.2473 24.8768C65.9064 28.5346 74.4589 36.8553 78.1158 47.487C81.7727 58.1186 80.2033 70.1585 73.8821 79.5222L50 55L26.1179 79.5222C19.7967 70.1585 18.2273 58.1186 21.8842 47.487C25.5411 36.8553 34.0936 28.5346 44.7527 24.8768C51.277 22.5855 58.3039 22.8427 64.6923 25.597"
+                    class="chatbot-main-color" stroke-opacity="0.1" stroke-width="1" />
+                <path d="M50 7.5L50 0" class="chatbot-main-color" stroke-width="2" />
+                <path d="M50 15L50 22.5" class="chatbot-main-color" stroke-width="2" />
+                <path d="M42.5 7.5L35 7.5" class="chatbot-main-color" stroke-width="2" />
+                <path d="M65 7.5L57.5 7.5" class="chatbot-main-color" stroke-width="2" />
+                <path d="M46.4645 11.0355L40.8076 5.37868" class="chatbot-main-color" stroke-width="2" />
+                <path d="M59.1924 19.6924L53.5355 14.0355" class="chatbot-main-color" stroke-width="2" />
+                <path d="M46.4645 19.6924L40.8076 25.3492" class="chatbot-main-color" stroke-width="2" />
+                <path d="M59.1924 11.0355L53.5355 16.6924" class="chatbot-main-color" stroke-width="2" />
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M10 55C10 35.67 25.67 20 45 20H55C74.33 20 90 35.67 90 55V65C90 70.5228 85.5228 75 80 75H20C14.4772 75 10 70.5228 10 65V55Z"
+                    class="chatbot-main-color" fill-opacity="0.9" />
+                <circle cx="35" cy="50" r="5" class="chatbot-accent-color" />
+                <circle cx="65" cy="50" r="5" class="chatbot-accent-color" />
+                <circle cx="36" cy="49" r="2" class="chatbot-main-color" fill-opacity="0.7" />
+                <circle cx="66" cy="49" r="2" class="chatbot-main-color" fill-opacity="0.7" />
+            </g>
             <defs>
-                <radialGradient id="eyeGradient">
-                    <stop offset="0%" stop-color="#80FFFF" />
-                    <stop offset="100%" stop-color="#00FFFF" />
-                </radialGradient>
+                <filter id="filter0_d_101_2" x="0" y="0" width="100" height="84.0444" filterUnits="userSpaceOnUse"
+                    color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                        result="hardAlpha" />
+                    <feOffset dy="2" />
+                    <feGaussianBlur stdDeviation="5" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix"
+                        values="0 0 0 0 0.490196 0 0 0 0 0.741176 0 0 0 0 0.988235 0 0 0 0.5 0" />
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_101_2" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_101_2" result="shape" />
+                </filter>
             </defs>
-            <circle cx="50" cy="50" r="45" fill="none" stroke="url(#eyeGradient)" stroke-width="4" />
-            <circle cx="50" cy="50" r="25" fill="url(#eyeGradient)" />
-            <circle cx="50" cy="50" r="10" fill="#1a1a1a" />
         </svg>
     </div>
 
-    <div id="chat-window" class="hidden glass-morphism flex flex-col">
+    <div id="chat-window" class="glass-morphism flex flex-col">
         <div id="chat-header" class="flex justify-between items-center p-4 border-b border-[#336699]/40">
             <h3 class="text-base text-white">Portfolio Assistant</h3>
             <button id="close-chat" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
@@ -1157,7 +1207,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- REMOVED Three.js library -->
 
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -1179,8 +1229,16 @@
                 document.body.classList.remove('loading');
             }, 5000); // Wait for the full boot sequence to finish
 
-            // Scroll to top on page load/refresh
-            window.scrollTo(0, 0);
+            // Force scroll to top on page load/refresh, overriding any URL hash
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    window.scrollTo(0, 0);
+                }, 0);
+            });
+
+            if (history.scrollRestoration) {
+                history.scrollRestoration = 'manual';
+            }
 
             // --- 1. SETUP ---
             const pinnedElement = document.getElementById('pinned-element');
@@ -1192,16 +1250,11 @@
             const bodyEl = document.body;
 
 
-            // Theme switcher logic
-            if (localStorage.getItem('color-theme') === 'dark') {
-                lightIcon.classList.add('hidden');
-                darkIcon.classList.remove('hidden');
-                bodyEl.classList.remove('light');
-            } else {
-                lightIcon.classList.remove('hidden');
-                darkIcon.classList.add('hidden');
-                bodyEl.classList.add('light');
-            }
+            // Force light theme on page load
+            lightIcon.classList.remove('hidden');
+            darkIcon.classList.add('hidden');
+            bodyEl.classList.add('light');
+            localStorage.setItem('color-theme', 'light');
 
             themeToggleBtn.addEventListener('click', function () {
                 darkIcon.classList.toggle('hidden');
@@ -1232,9 +1285,6 @@
             });
 
 
-            let threeScene, camera, renderer, lensGroup;
-            const numDots = 5;
-
             // --- 2. ASSETS & CONTENT ---
             const scrollContent = [
                 { title: "", description: "", align: 'right' },
@@ -1245,9 +1295,9 @@
             ];
 
             const svgs = {
-                hudFrame: `<svg id="hud-frame" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="glossy" cx="50%" cy="0%" r="100%" fx="50%" fy="0%"><stop offset="0%" style="stop-color:rgba(255, 255, 255, 0.4)" /><stop offset="100%" style="stop-color:rgba(255, 255, 255, 0)" /></radialGradient></defs><circle cx="100" cy="100" r="95" fill="none" stroke="#2a2a30" stroke-width="6"/><g id="tick-marks" stroke="#888" stroke-width="1" stroke-linecap="round">${[...Array(120)].map((_, i) => `<path d="M100 ${i % 5 === 0 ? 10 : 12} L100 18" transform="rotate(${i * 3}, 100, 100)"/>`).join('')}</g><g fill="none" stroke-width="4" stroke-linecap="round"><path id="arc-1" d="M 190 100 A 90 90 0 0 1 100 190" stroke="#0F9D58"/><path id="arc-2" d="M 100 190 A 90 90 0 0 1 10 100" stroke="#3367C0"/><path id="arc-3" d="M 10 100 A 90 90 0 0 1 100 10" stroke="#A33229"/><path id="arc-4" d="M 100 10 A 90 90 0 0 1 190 100" stroke="#F4B400"/></g><circle cx="100" cy="100" r="98" fill="url(#glossy)" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/></svg>`,
+                hudFrame: `<svg id="hud-frame" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="glossy" cx="50%" cy="0%" r="100%" fx="50%" fy="0%"><stop offset="0%" style="stop-color:rgba(255, 255, 255, 0.4)" /><stop offset="100%" style="stop-color:rgba(255, 255, 255, 0)" /></radialGradient></defs><circle cx="100" cy="100" r="95" fill="none" stroke="#2a2a30" stroke-width="6"/><g id="tick-marks" class="hud-tick-mark" stroke-width="1" stroke-linecap="round">${[...Array(120)].map((_, i) => `<path d="M100 ${i % 5 === 0 ? 10 : 12} L100 18" transform="rotate(${i * 3}, 100, 100)"/>`).join('')}</g><g fill="none" stroke-width="4" stroke-linecap="round"><path id="arc-1" d="M 190 100 A 90 90 0 0 1 100 190" stroke="#0F9D58"/><path id="arc-2" d="M 100 190 A 90 90 0 0 1 10 100" stroke="#3367C0"/><path id="arc-3" d="M 10 100 A 90 90 0 0 1 100 10" stroke="#A33229"/><path id="arc-4" d="M 100 10 A 90 90 0 0 1 190 100" stroke="#F4B400"/></g><circle cx="100" cy="100" r="98" fill="url(#glossy)" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/></svg>`,
                 staggerDots: `<svg id="svg-stagger-dots" class="hud-content-svg" viewBox="0 0 100 100"></svg>`,
-                clockwork: `<svg id="svg-clockwork" class="hud-content-svg" viewBox="0 0 100 100"><g id="clock-ticks">${[...Array(60)].map((_, i) => `<path d="M50 ${i % 5 === 0 ? 5 : 8} L50 12" stroke-width="${i % 5 === 0 ? '1.5' : '0.5'}" stroke="#f0f0f0" transform="rotate(${i * 6}, 50, 50)" />`).join('')}</g><path id="clock-hand" d="M50 50 L50 15" stroke="#F4B400" stroke-width="2" stroke-linecap="round" /></svg>`,
+                clockwork: `<svg id="svg-clockwork" class="hud-content-svg" viewBox="0 0 100 100"><g id="clock-ticks" class="hud-clock-tick">${[...Array(60)].map((_, i) => `<path d="M50 ${i % 5 === 0 ? 5 : 8} L50 12" stroke-width="${i % 5 === 0 ? '1.5' : '0.5'}" transform="rotate(${i * 6}, 50, 50)" />`).join('')}</g><path id="clock-hand" d="M50 50 L50 15" stroke="#F4B400" stroke-width="2" stroke-linecap="round" /></svg>`,
                 springs: `<svg id="svg-springs" class="hud-content-svg" viewBox="0 0 100 100"></svg>`,
                 finalPattern: `<svg id="svg-final-pattern" class="hud-content-svg" viewBox="0 0 100 100"></svg>`,
             };
@@ -1384,12 +1434,12 @@
                         company: 'Forage',
                         logo: 'https://cdn.brandfetch.io/idV710Mm_L/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1758723297034',
                         credentials: [
-                            { name: 'Branding & Design Job Simulation', url: 'https://www.theforage.com/completion-certificates/HgpPSsyQpzob6HEh9/GEZvgDCZaMT3rqfRr_HgpPSsyQpzob6HEh9_68cb1c8d15c59647ef0fd6d3_1758706723589_completion_certificate.pdf' }
+                        { name: 'Branding & Design Job Simulation', url: 'https://www.theforage.com/completion-certificates/HgpPSsyQpzob6HEh9/GEZvgDCZaMT3rqfRr_HgpPSsyQpzob6HEh9_68cb1c8d15c59647ef0fd6d3_1758706723589_completion_certificate.pdf' }
                         ]
                     },
                     {
                         company: 'Asterisc-python3',
-                        logo: 'data:image/jpeg;base64,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',
+                        logo: 'https://ugc.production.linktr.ee/FkqHcdwPRbiztlCxKyeF_geigtpU4I3u590QN?io=true&size=avatar-v3_0',
                         credentials: [
                             { name: 'Python-3 Programming', url: 'https://drive.google.com/file/d/169OETqm19aT5-wTkfsaMtckLV9ipf5w4/view?usp=sharing' }
                         ]
@@ -1421,7 +1471,7 @@
             scrollContentContainer.innerHTML = contentHTML;
             const contentSections = document.querySelectorAll('.content-section');
 
-            // --- 4. THREE.JS, CANVAS & ANIMATION SETUP ---
+            // --- 4. CANVAS & ANIMATION SETUP ---
             let sciFiAnimation, backgroundAnimation;
 
             function createPlexusAnimation(canvas, particleCount, maxDist, color) {
@@ -1539,43 +1589,6 @@
                 };
             }
 
-
-            function initThree() {
-                threeScene = new THREE.Scene();
-                camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-                camera.position.z = 5;
-                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-                renderer.setSize(pinnedElement.clientWidth * 0.8, pinnedElement.clientHeight * 0.8);
-                renderer.setPixelRatio(window.devicePixelRatio);
-                const canvas = renderer.domElement;
-                canvas.id = 'three-canvas';
-                gsap.set(canvas, { opacity: 0 });
-                pinnedElement.appendChild(canvas);
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-                threeScene.add(ambientLight);
-                const pointLight = new THREE.PointLight(0xffffff, 1);
-                pointLight.position.set(5, 5, 5);
-                threeScene.add(pointLight);
-                lensGroup = new THREE.Group();
-                const material = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.4, metalness: 0.8 });
-                const mainTube = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 2.5, 32), material);
-                mainTube.rotation.x = Math.PI / 2;
-                const objective = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 0.5, 32), material);
-                objective.rotation.x = Math.PI / 2;
-                objective.position.z = 1.5;
-                const eyepiece = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.8, 32), material);
-                eyepiece.rotation.x = Math.PI / 2;
-                eyepiece.position.z = -1.3;
-                lensGroup.add(mainTube, objective, eyepiece);
-                lensGroup.rotation.set(0, Math.PI / 6, -Math.PI / 8);
-                threeScene.add(lensGroup);
-                function animate() {
-                    requestAnimationFrame(animate);
-                    renderer.render(threeScene, camera);
-                }
-                animate();
-            }
-
             function setupPinnedElements() {
                 const sciFiCanvas = document.createElement('canvas');
                 sciFiCanvas.id = 'sci-fi-canvas';
@@ -1584,7 +1597,6 @@
                 pinnedElement.appendChild(sciFiCanvas);
                 pinnedElement.insertAdjacentHTML('beforeend', svgs.staggerDots + svgs.clockwork + svgs.springs + svgs.finalPattern);
 
-                initThree();
                 sciFiAnimation = createPlexusAnimation(sciFiCanvas, 80, 100, '#336699');
 
                 const children = gsap.utils.toArray(pinnedElement.children).filter(el => el.id !== 'hud-frame' && el.id !== 'sci-fi-canvas');
@@ -1610,6 +1622,7 @@
                 setupDotGrid('svg-final-pattern', '#996633');
 
                 const springsSVG = document.getElementById('svg-springs');
+                const numDots = 5;
                 for (let i = 0; i < numDots; i++) {
                     const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                     gsap.set(el, { attr: { cx: 50, cy: 50, r: 5 }, fill: '#336699' });
@@ -1709,7 +1722,6 @@
 
 
             const sciFiCanvas = document.getElementById('sci-fi-canvas');
-            const threeCanvas = document.getElementById('three-canvas');
             const svgStaggerDots = document.getElementById('svg-stagger-dots');
             const svgClockwork = document.getElementById('svg-clockwork');
             const svgClockHand = document.getElementById('clock-hand');
@@ -1758,8 +1770,6 @@
                 }
             });
 
-            tl.to(colorArcs, { strokeDashoffset: 0, duration: p(4), stagger: p(0.5) }, 0);
-
             const circleSize = (pinnedElement.getBoundingClientRect().width / window.innerWidth) * 50;
             tl.to(sciFiCanvas, { opacity: 0, duration: p(0.2) }, p(0))
                 .fromTo(backgroundCanvas,
@@ -1768,14 +1778,17 @@
                     p(0)
                 );
 
-            tl.to(threeCanvas, { opacity: 1, duration: p(0.1) }, p(0.5));
+            // --- MODIFIED ANIMATION TIMELINE ---
 
-            tl.to(lensGroup.children[1].position, { z: 2.2, duration: p(1) }, p(1))
-                .to(lensGroup.children[2].position, { z: -2.0, duration: p(1) }, p(1))
-                .to(lensGroup.rotation, { x: Math.PI / 8, y: Math.PI / 2, duration: p(1) }, p(1));
+            // 1. Color Arcs and Clock Animation - Run together from p(0) to p(1)
+            tl.to(colorArcs, { strokeDashoffset: 0, duration: p(1), stagger: p(0.25) }, 0);
+            tl.to(svgClockwork, { opacity: 1, duration: p(0.1) }, 0)
+                .to(svgClockHand, { rotation: 1080, transformOrigin: '50% 50%', duration: p(1) }, 0);
 
+            // 2. Skills Section - Starts at p(1)
             const skillsStartTime = p(1);
             const skillsEndTime = p(2);
+            tl.to(svgClockwork, { opacity: 0, duration: p(0.1) }, skillsStartTime); // Fade out clock as skills start
             tl.to(skillsTitle, { opacity: 1, x: 0, duration: p(0.5) }, skillsStartTime);
             tl.to(skillsTitle, { opacity: 0, x: -30, duration: p(0.5) }, skillsEndTime);
             tl.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'visible' }, skillsStartTime);
@@ -1785,6 +1798,7 @@
             tl.to(allSkillsCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, skillsEndTime);
             tl.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'hidden' }, skillsEndTime + p(0.5));
 
+            // 3. Projects Section
             const projectsStartTime = p(2);
             const projectsEndTime = p(4);
             tl.to(projectsTitle, { opacity: 1, x: 0, duration: p(0.5) }, projectsStartTime);
@@ -1796,13 +1810,10 @@
             tl.to(projectCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, projectsEndTime);
             tl.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'hidden' }, projectsEndTime + p(0.5));
 
-            tl.to(threeCanvas, { opacity: 0, duration: p(0.1) }, p(4))
-                .to(svgClockwork, { opacity: 1, duration: p(0.1) }, p(4))
-                .to(svgClockHand, { rotation: 1080, transformOrigin: '50% 50%', duration: p(1) }, p(4));
+            // 4. Final Pattern Animation
+            tl.to(svgFinalPattern, { opacity: 1, duration: p(0.1) }, p(4))
+                .from(gsap.utils.toArray('#svg-final-pattern circle'), { scale: 0, stagger: { grid: 'auto', from: 'center', amount: p(0.8) }, duration: p(1), }, p(4));
 
-            tl.to(svgClockwork, { opacity: 0, duration: p(0.1) }, p(5))
-                .to(svgFinalPattern, { opacity: 1, duration: p(0.1) }, p(5))
-                .from(gsap.utils.toArray('#svg-final-pattern circle'), { scale: 0, stagger: { grid: 'auto', from: 'center', amount: p(0.8) }, duration: p(1), }, p(5));
 
             // --- Standalone Certifications Section Animation ---
             gsap.from("#certifications-title", {
@@ -1842,30 +1853,103 @@
                 }
             });
 
-            // --- Chatbot Logic ---
-            const chatbotToggle = document.getElementById('chatbot-toggle');
+            // --- Roaming Bot & Chat Logic (NEW) ---
+            const bot = document.getElementById('roaming-bot');
             const chatWindow = document.getElementById('chat-window');
-            const closeChat = document.getElementById('close-chat');
+            const closeChatBtn = document.getElementById('close-chat');
             const chatForm = document.getElementById('chat-form');
             const chatInput = document.getElementById('chat-input');
             const chatMessages = document.getElementById('chat-messages');
 
-            const toggleChat = (forceOpen = null) => {
-                const isOpen = chatWindow.classList.contains('open');
-                if (forceOpen === true || (!isOpen && forceOpen === null)) {
-                    chatWindow.classList.remove('hidden');
-                    setTimeout(() => chatWindow.classList.add('open'), 10);
-                } else if (forceOpen === false || (isOpen && forceOpen === null)) {
-                    chatWindow.classList.remove('open');
-                    chatWindow.addEventListener('transitionend', () => {
-                        chatWindow.classList.add('hidden');
-                    }, { once: true });
-                }
+            const botSize = 60;
+            let screenWidth = window.innerWidth;
+            let screenHeight = window.innerHeight;
+
+            let isChatOpen = false;
+            let animationFrameId;
+
+            let currentPos = {
+                x: Math.random() * (screenWidth - botSize),
+                y: Math.random() * (screenHeight - botSize)
             };
 
-            chatbotToggle.addEventListener('click', () => toggleChat());
-            closeChat.addEventListener('click', () => toggleChat(false));
+            let targetPos = { x: 0, y: 0 };
+            const speed = 0.5;
 
+            function setNewTargetPosition() {
+                targetPos.x = Math.random() * (screenWidth - botSize);
+                targetPos.y = Math.random() * (screenHeight - botSize);
+            }
+
+            function animateBot() {
+                if (isChatOpen) return;
+
+                const dx = targetPos.x - currentPos.x;
+                const dy = targetPos.y - currentPos.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < speed) {
+                    currentPos.x = targetPos.x;
+                    currentPos.y = targetPos.y;
+                    setNewTargetPosition();
+                } else {
+                    currentPos.x += (dx / distance) * speed;
+                    currentPos.y += (dy / distance) * speed;
+                }
+
+                bot.style.transform = `translate(${currentPos.x}px, ${currentPos.y}px)`;
+                animationFrameId = requestAnimationFrame(animateBot);
+            }
+
+            function openChat() {
+                isChatOpen = true;
+                cancelAnimationFrame(animationFrameId);
+
+                const chatWidth = 350;
+                const chatHeight = 500;
+                let chatX = currentPos.x + botSize;
+                let chatY = currentPos.y;
+
+                if (chatX + chatWidth > screenWidth) chatX = currentPos.x - chatWidth;
+                if (chatY + chatHeight > screenHeight) chatY = screenHeight - chatHeight - 20;
+                if (chatY < 0) chatY = 20;
+
+                chatWindow.style.left = `${chatX}px`;
+                chatWindow.style.top = `${chatY}px`;
+                chatWindow.classList.add('open');
+            }
+
+            function closeChat() {
+                isChatOpen = false;
+                chatWindow.classList.remove('open');
+                animateBot();
+            }
+
+            let clickTimer = null;
+            bot.addEventListener('click', () => {
+                if (clickTimer === null) {
+                    clickTimer = setTimeout(() => {
+                        clickTimer = null;
+                        if (!isChatOpen) openChat();
+                    }, 250);
+                } else {
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                    if (!isChatOpen) {
+                        setNewTargetPosition();
+                        currentPos.x = targetPos.x;
+                        currentPos.y = targetPos.y;
+                    }
+                }
+            });
+
+            closeChatBtn.addEventListener('click', closeChat);
+
+            // Start the bot animation
+            setNewTargetPosition();
+            animateBot();
+
+            // --- Existing Chat Form Logic ---
             const addMessage = (message, sender, messageId = null) => {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('chat-message');
@@ -2105,134 +2189,135 @@
 
     <!-- Drone Game Script -->
     <script>
-        // Game implementation
-        const gameCanvas = document.getElementById('game-canvas');
-        if (gameCanvas) {
-            const gameCtx = gameCanvas.getContext('2d');
-            const DRONE_WIDTH = 38;
-            const DRONE_HEIGHT = 20;
-            const GROUND_Y = gameCanvas.height - 20;
+        window.addEventListener('load', () => {
+            // Game implementation
+            const gameCanvas = document.getElementById('game-canvas');
+            if (gameCanvas) {
+                const gameCtx = gameCanvas.getContext('2d');
+                const DRONE_WIDTH = 38;
+                const DRONE_HEIGHT = 20;
+                const GROUND_Y = gameCanvas.height - 20;
 
-            let score = 0;
-            let highScore = 0;
-            let gameSpeed = 5;
-            let isPlaying = false;
-            let isGameOver = true;
-            let gameAnimationFrameId;
+                let score = 0;
+                let highScore = 0;
+                let gameSpeed = 5;
+                let isPlaying = false;
+                let isGameOver = true;
+                let gameAnimationFrameId;
 
-            class Drone {
-                constructor() {
-                    this.x = 50; this.y = GROUND_Y - DRONE_HEIGHT;
-                    this.width = DRONE_WIDTH; this.height = DRONE_HEIGHT;
-                    this.velocityY = 0; this.isAscending = false;
-                    this.ascendPower = -10; this.gravity = 0.4;
-                }
-                draw() {
-                    const droneColor = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
-                    gameCtx.fillStyle = droneColor;
-                    gameCtx.fillRect(this.x, this.y + 5, this.width, this.height - 10);
-                    gameCtx.fillRect(this.x + 2, this.y, 10, 5);
-                    gameCtx.fillRect(this.x + this.width - 12, this.y, 10, 5);
-                    gameCtx.fillStyle = '#F4B400';
-                    gameCtx.beginPath();
-                    gameCtx.arc(this.x + this.width / 2, this.y + 12, 4, 0, Math.PI * 2);
-                    gameCtx.fill();
-                }
-                ascend() { if (!this.isAscending && isPlaying) { this.isAscending = true; this.velocityY = this.ascendPower; } }
-                update() {
-                    if (this.isAscending) {
-                        this.y += this.velocityY;
-                        this.velocityY += this.gravity;
-                        if (this.y > GROUND_Y - this.height) { this.y = GROUND_Y - this.height; this.isAscending = false; this.velocityY = 0; }
+                class Drone {
+                    constructor() {
+                        this.x = 50; this.y = GROUND_Y - DRONE_HEIGHT;
+                        this.width = DRONE_WIDTH; this.height = DRONE_HEIGHT;
+                        this.velocityY = 0; this.isAscending = false;
+                        this.ascendPower = -10; this.gravity = 0.4;
                     }
-                    this.draw();
+                    draw() {
+                        const droneColor = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
+                        gameCtx.fillStyle = droneColor;
+                        gameCtx.fillRect(this.x, this.y + 5, this.width, this.height - 10);
+                        gameCtx.fillRect(this.x + 2, this.y, 10, 5);
+                        gameCtx.fillRect(this.x + this.width - 12, this.y, 10, 5);
+                        gameCtx.fillStyle = '#F4B400';
+                        gameCtx.beginPath();
+                        gameCtx.arc(this.x + this.width / 2, this.y + 12, 4, 0, Math.PI * 2);
+                        gameCtx.fill();
+                    }
+                    ascend() { if (!this.isAscending && isPlaying) { this.isAscending = true; this.velocityY = this.ascendPower; } }
+                    update() {
+                        if (this.isAscending) {
+                            this.y += this.velocityY;
+                            this.velocityY += this.gravity;
+                            if (this.y > GROUND_Y - this.height) { this.y = GROUND_Y - this.height; this.isAscending = false; this.velocityY = 0; }
+                        }
+                        this.draw();
+                    }
                 }
-            }
-            class Obstacle {
-                constructor(x, width, height) { this.x = x; this.y = GROUND_Y - height; this.width = width; this.height = height; }
-                draw() {
-                    const obstacleColor = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
-                    gameCtx.fillStyle = obstacleColor; gameCtx.fillRect(this.x, this.y, this.width, this.height);
+                class Obstacle {
+                    constructor(x, width, height) { this.x = x; this.y = GROUND_Y - height; this.width = width; this.height = height; }
+                    draw() {
+                        const obstacleColor = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
+                        gameCtx.fillStyle = obstacleColor; gameCtx.fillRect(this.x, this.y, this.width, this.height);
+                    }
+                    update() { this.x -= gameSpeed; this.draw(); }
                 }
-                update() { this.x -= gameSpeed; this.draw(); }
-            }
-            let drone = new Drone();
-            let obstacles = [];
-            let obstacleSpawnTimer = 0, nextObstacleSpawnTime = 100;
-            function spawnObstacle() {
-                const isFlyer = Math.random() < 0.3;
-                let width = isFlyer ? 40 : (15 * (Math.floor(Math.random() * 3) + 1));
-                let height = isFlyer ? 20 : 35;
-                const newObstacle = new Obstacle(gameCanvas.width, width, height);
-                if (isFlyer) newObstacle.y = GROUND_Y - height - (Math.random() > 0.5 ? 25 : 0);
-                obstacles.push(newObstacle);
-            }
-            function updateScore() {
-                score++;
-                if (score > highScore) highScore = score;
-                if (score % 100 === 0) gameSpeed += 0.5;
-            }
-            function drawScore() {
-                gameCtx.fillStyle = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
-                gameCtx.font = "bold 16px 'Inter', sans-serif";
-                gameCtx.textAlign = 'left';
-                const scoreText = `HI ${String(highScore).padStart(5, '0')} ${String(Math.floor(score / 10)).padStart(5, '0')}`;
-                gameCtx.fillText(scoreText, 20, 30);
-            }
-            function drawGround() {
-                gameCtx.beginPath();
-                gameCtx.moveTo(0, GROUND_Y);
-                gameCtx.lineTo(gameCanvas.width, GROUND_Y);
-                gameCtx.strokeStyle = document.body.classList.contains('light') ? 'rgba(26, 26, 26, 0.5)' : 'rgba(240, 240, 240, 0.5)';
-                gameCtx.lineWidth = 2;
-                gameCtx.stroke();
-            }
-            function detectCollision(a, b) { return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y; }
-            function gameLoop() {
-                if (isGameOver) return;
-                gameAnimationFrameId = requestAnimationFrame(gameLoop);
-                gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-                drawGround();
-                drone.update();
-                obstacleSpawnTimer++;
-                if (obstacleSpawnTimer >= nextObstacleSpawnTime) {
-                    spawnObstacle();
-                    obstacleSpawnTimer = 0;
-                    nextObstacleSpawnTime = Math.floor(Math.random() * 61) + 60;
+                let drone = new Drone();
+                let obstacles = [];
+                let obstacleSpawnTimer = 0, nextObstacleSpawnTime = 100;
+                function spawnObstacle() {
+                    const isFlyer = Math.random() < 0.3;
+                    let width = isFlyer ? 40 : (15 * (Math.floor(Math.random() * 3) + 1));
+                    let height = isFlyer ? 20 : 35;
+                    const newObstacle = new Obstacle(gameCanvas.width, width, height);
+                    if (isFlyer) newObstacle.y = GROUND_Y - height - (Math.random() > 0.5 ? 25 : 0);
+                    obstacles.push(newObstacle);
                 }
-                obstacles.forEach((obstacle, index) => {
-                    obstacle.update();
-                    if (obstacle.x + obstacle.width < 0) setTimeout(() => obstacles.splice(index, 1), 0);
-                    if (detectCollision(drone, obstacle)) endGame();
-                });
-                updateScore();
-                drawScore();
-            }
-            function startGame() {
-                if (isPlaying) return;
-                if (isGameOver) resetGame();
-                isPlaying = true; isGameOver = false;
-                gameLoop();
-            }
-            function endGame() { isPlaying = false; isGameOver = true; cancelAnimationFrame(gameAnimationFrameId); }
-            function resetGame() { score = 0; gameSpeed = 5; obstacles = []; drone = new Drone(); isGameOver = false; }
-            function handleInput(e) {
-                if (e.code === 'Space' || e.code === 'ArrowUp') {
-                    e.preventDefault(); if (!isPlaying) startGame(); drone.ascend();
+                function updateScore() {
+                    score++;
+                    if (score > highScore) highScore = score;
+                    if (score % 100 === 0) gameSpeed += 0.5;
                 }
+                function drawScore() {
+                    gameCtx.fillStyle = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
+                    gameCtx.font = "bold 16px 'Inter', sans-serif";
+                    gameCtx.textAlign = 'left';
+                    const scoreText = `HI ${String(highScore).padStart(5, '0')} ${String(Math.floor(score / 10)).padStart(5, '0')}`;
+                    gameCtx.fillText(scoreText, 20, 30);
+                }
+                function drawGround() {
+                    gameCtx.beginPath();
+                    gameCtx.moveTo(0, GROUND_Y);
+                    gameCtx.lineTo(gameCanvas.width, GROUND_Y);
+                    gameCtx.strokeStyle = document.body.classList.contains('light') ? 'rgba(26, 26, 26, 0.5)' : 'rgba(240, 240, 240, 0.5)';
+                    gameCtx.lineWidth = 2;
+                    gameCtx.stroke();
+                }
+                function detectCollision(a, b) { return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y; }
+                function gameLoop() {
+                    if (isGameOver) return;
+                    gameAnimationFrameId = requestAnimationFrame(gameLoop);
+                    gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+                    drawGround();
+                    drone.update();
+                    obstacleSpawnTimer++;
+                    if (obstacleSpawnTimer >= nextObstacleSpawnTime) {
+                        spawnObstacle();
+                        obstacleSpawnTimer = 0;
+                        nextObstacleSpawnTime = Math.floor(Math.random() * 61) + 60;
+                    }
+                    obstacles.forEach((obstacle, index) => {
+                        obstacle.update();
+                        if (obstacle.x + obstacle.width < 0) setTimeout(() => obstacles.splice(index, 1), 0);
+                        if (detectCollision(drone, obstacle)) endGame();
+                    });
+                    updateScore();
+                    drawScore();
+                }
+                function startGame() {
+                    if (isPlaying) return;
+                    if (isGameOver) resetGame();
+                    isPlaying = true; isGameOver = false;
+                    gameLoop();
+                }
+                function endGame() { isPlaying = false; isGameOver = true; cancelAnimationFrame(gameAnimationFrameId); }
+                function resetGame() { score = 0; gameSpeed = 5; obstacles = []; drone = new Drone(); isGameOver = false; }
+                function handleInput(e) {
+                    if (e.code === 'Space' || e.code === 'ArrowUp') {
+                        e.preventDefault(); if (!isPlaying) startGame(); drone.ascend();
+                    }
+                }
+                gameCanvas.addEventListener('keydown', handleInput);
+                gameCanvas.addEventListener('mousedown', () => { if (!isPlaying) startGame(); drone.ascend(); });
+                gameCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); if (!isPlaying) startGame(); drone.ascend(); });
+                function initGame() {
+                    gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+                    drawGround(); drone.draw(); drawScore();
+                }
+                document.getElementById('theme-toggle').addEventListener('click', () => { if (!isPlaying) setTimeout(initGame, 10); });
+                initGame();
             }
-            gameCanvas.addEventListener('keydown', handleInput);
-            gameCanvas.addEventListener('mousedown', () => { if (!isPlaying) startGame(); drone.ascend(); });
-            gameCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); if (!isPlaying) startGame(); drone.ascend(); });
-            function initGame() {
-                gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-                drawGround(); drone.draw(); drawScore();
-            }
-            document.getElementById('theme-toggle').addEventListener('click', () => { if (!isPlaying) setTimeout(initGame, 10); });
-            initGame();
-        }
+        });
     </script>
 </body>
 
 </html>
-
