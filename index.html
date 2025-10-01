@@ -32,6 +32,11 @@
     <!-- End Google Tag Manager -->
 
     <style>
+        :root {
+            --light-board-bg: url('https://raw.githubusercontent.com/yogvidwankhede/Portfolio/main/images/board_white.png');
+            --dark-board-bg: url('https://raw.githubusercontent.com/yogvidwankhede/Portfolio/main/images/board_black.png');
+        }
+
         /* Custom styles for the dark theme and layout */
         body {
             background-color: #1a1a1a;
@@ -41,6 +46,18 @@
             scroll-behavior: smooth;
             scrollbar-width: none;
             /* For Firefox */
+        }
+
+        body.board-background {
+            background-image: var(--dark-board-bg);
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        body.light.board-background {
+            background-image: var(--light-board-bg);
         }
 
         h1,
@@ -118,8 +135,9 @@
 
         /* --- End of New Hero Section Styling --- */
 
-
-        #background-canvas {
+        #plexus-canvas,
+        #three-canvas,
+        #viz-canvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -167,11 +185,9 @@
         }
 
         /* Ensure content canvases & SVGs fit and are layered correctly */
-        #three-canvas,
-        #sci-fi-canvas,
-        .hud-content-svg {
-            width: 80%;
-            height: 80%;
+        #sci-fi-canvas {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             position: absolute;
             top: 50%;
@@ -862,8 +878,26 @@
         body.light #boot-text-container .final-text {
             color: #1a1a1a;
         }
+
+        /* --- Interactive 2D Viz Styles --- */
+        .project-card {
+            position: fixed;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(10px);
+            z-index: 100;
+        }
+
+        .project-card.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
     </style>
 </head>
+<!-- <body class="antialiased loading light"> -->
+<!-- For loading in Light mode when clicked on reload , also uncommnt 4 lines from line 1920-->
 
 <body class="antialiased loading light">
 
@@ -885,7 +919,11 @@
         </div>
     </section>
 
-    <canvas id="background-canvas"></canvas>
+    <canvas id="plexus-canvas"></canvas>
+    <canvas id="three-canvas"></canvas>
+    <canvas id="viz-canvas"></canvas>
+    <div id="project-cards-container"></div>
+
 
     <header class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center">
         <div class="flex items-center space-x-3">
@@ -984,7 +1022,7 @@
             Highlighted Work
         </h2>
 
-        <div id="pinned-container" class="h-[700vh] relative w-full">
+        <div id="pinned-container" class="h-[1200vh] relative w-full">
             <div id="pin-wrapper" class="h-screen w-full sticky top-0 left-0 overflow-hidden">
                 <div id="callout-container">
                     <div id="callout-labels-container"></div>
@@ -1082,7 +1120,7 @@
                             </div>
                             <div>
                                 <h3 class="">Location</h3>
-                                <p class="text-gray-400">Nagpur, India</p>
+                                <p class="text-gray-400">St. Louis, USA</p>
                             </div>
                         </div>
                     </div>
@@ -1207,14 +1245,642 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
 
-    <!-- REMOVED Three.js library -->
+    <!-- Three.js library for 3D cylinder -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <script type="module">
+        // --- Three.js Globals ---
+        let threeScene, threeCamera, threeRenderer, threeCylinder, threeWireframe;
+        let textureCanvas, textureCtx, texturePlexus, threeAnimationId;
+
+        // --- Interactive 2D Viz Globals ---
+        let vizCanvas, vizCtx, cardsContainer, vizScrollPercent = 0, categoryNodes = [], pcbPaths = [], vizColors = {};
+        let vizAnimationId;
+
+        const projectData = [
+            {
+                name: "Chat Bots",
+                projects: [
+                    { name: "Customer Service AI", link: "https://github.com" },
+                    { name: "Slack Integration Bot", link: "https://github.com" },
+                ]
+            },
+            {
+                name: "Visualizations",
+                projects: [
+                    { name: "D3.js Stock Market Chart", link: "https://github.com" },
+                    { name: "Three.js 3D Globe", link: "https://github.com" },
+                ]
+            },
+            {
+                name: "Software-Based Projects",
+                projects: [
+                    { name: "Project Management Tool", link: "https://github.com" },
+                    { name: "E-commerce Platform", link: "https://github.com" },
+                    { name: "Mobile Banking App", link: "https://github.com" },
+                    { name: "Educational Resource Management", link: "https://github.com/yogvidwankhede/Educational-Resource-Management" },
+                ]
+            },
+            {
+                name: "Machine Learning",
+                projects: [
+                    { name: "Image Recognition Model", link: "https://github.com" },
+                    { name: "Sentiment Analysis API", link: "https://github.com" },
+                    { name: "Real-Time Sign Language Interpreter", link: "https://github.com/yogvidwankhede/Sign_Language_Interpreter" },
+                    { name: "Fake News Detection", link: "https://github.com/yogvidwankhede/Fake_News_Detection" },
+                    { name: "Image Captioning System", link: "#" },
+                ]
+            },
+            {
+                name: "Data Analysis",
+                projects: [
+                    { name: "Sales Trend Dashboard", link: "https://github.com" },
+                    { name: "User Behavior Study", link: "https://github.com" },
+                    { name: "Hospital Data Analysis", link: "https://github.com/yogvidwankhede/EDA" },
+                ]
+            }
+        ];
+
+
+        function createPlexusAnimation(canvas, particleCount, maxDist, color) {
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animationId;
+            const mouse = { x: undefined, y: undefined, radius: 150 };
+
+            let mouseMoveListener, mouseOutListener;
+
+            function hexToRgb(hex) {
+                let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+            }
+            const rgbColor = hexToRgb(color);
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            mouseMoveListener = (event) => {
+                const rect = canvas.getBoundingClientRect();
+                mouse.x = event.clientX - rect.left;
+                mouse.y = event.clientY - rect.top;
+            };
+            mouseOutListener = () => {
+                mouse.x = undefined;
+                mouse.y = undefined;
+            };
+            window.addEventListener('mousemove', mouseMoveListener);
+            window.addEventListener('mouseout', mouseOutListener);
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = Math.random() * 0.4 - 0.2;
+                    this.vy = Math.random() * 0.4 - 0.2;
+                    this.radius = 1.8;
+                    this.density = (Math.random() * 20) + 5;
+                }
+                update() {
+                    if (mouse.x !== undefined && mouse.y !== undefined) {
+                        let dx = mouse.x - this.x;
+                        let dy = mouse.y - this.y;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < mouse.radius) {
+                            const forceDirectionX = dx / distance;
+                            const forceDirectionY = dy / distance;
+                            const force = (mouse.radius - distance) / mouse.radius;
+                            const directionX = forceDirectionX * force * this.density;
+                            const directionY = forceDirectionY * force * this.density;
+                            this.x -= directionX;
+                            this.y -= directionY;
+                        }
+                    }
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                }
+            }
+            for (let i = 0; i < particleCount; i++) { particles.push(new Particle()); }
+
+            function connectParticles() {
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < maxDist && rgbColor) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b}, ${1 - dist / maxDist})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            function animate() {
+                if (!ctx) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.update(); p.draw(); });
+                connectParticles();
+                animationId = requestAnimationFrame(animate);
+            }
+
+            return {
+                stop: () => {
+                    cancelAnimationFrame(animationId);
+                    window.removeEventListener('mousemove', mouseMoveListener);
+                    window.removeEventListener('mouseout', mouseOutListener);
+                },
+                start: animate,
+            };
+        }
+
+        function createContainedPlexus(canvas, particleCount, maxDist, color) {
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            function hexToRgb(hex) {
+                let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+            }
+            const rgbColor = hexToRgb(color);
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = Math.random() * 0.4 - 0.2;
+                    this.vy = Math.random() * 0.4 - 0.2;
+                    this.radius = 2.5;
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                }
+            }
+            for (let i = 0; i < particleCount; i++) { particles.push(new Particle()); }
+
+            function connectParticles() {
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < maxDist && rgbColor) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b}, ${1 - dist / maxDist})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            return {
+                animate: () => {
+                    particles.forEach(p => { p.update(); p.draw(); });
+                    connectParticles();
+                }
+            };
+        }
+
+        function initThreeScene() {
+            if (threeScene) return; // Already initialized
+
+            const canvas = document.getElementById('three-canvas');
+
+            // 1. Scene & Camera
+            threeScene = new THREE.Scene();
+            threeCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            threeCamera.position.z = 2.8;
+
+            // 2. Renderer
+            threeRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            threeRenderer.setPixelRatio(window.devicePixelRatio);
+            threeRenderer.setSize(window.innerWidth, window.innerHeight);
+
+            // 3. Texture Canvas Setup
+            textureCanvas = document.createElement('canvas');
+            textureCanvas.width = 1024;
+            textureCanvas.height = 1024;
+            textureCtx = textureCanvas.getContext('2d');
+
+            // Plexus animation that draws onto our texture canvas
+            texturePlexus = createContainedPlexus(textureCanvas, 150, 120, '#336699');
+
+            const canvasTexture = new THREE.CanvasTexture(textureCanvas);
+
+            // 4. Geometry & Materials
+            const geometry = new THREE.CylinderGeometry(1.5, 1.5, 3.5, 64, 1, true);
+            const mainColor = 0x336699;
+
+            const material = new THREE.MeshStandardMaterial({
+                map: canvasTexture,
+                transparent: true,
+                metalness: 0.3,
+                roughness: 0.5,
+                side: THREE.DoubleSide
+            });
+
+            const wireframeMaterial = new THREE.MeshBasicMaterial({
+                color: mainColor,
+                wireframe: true,
+                opacity: 0.2,
+                transparent: true,
+            });
+
+            threeCylinder = new THREE.Mesh(geometry, material);
+            threeWireframe = new THREE.Mesh(geometry, wireframeMaterial);
+            threeScene.add(threeCylinder);
+            threeScene.add(threeWireframe);
+
+            // 5. Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            threeScene.add(ambientLight);
+            const pointLight = new THREE.PointLight(0xffffff, 0.5);
+            pointLight.position.set(5, 5, 5);
+            threeScene.add(pointLight);
+
+            // 6. Initial State (flat circle)
+            threeCylinder.rotation.x = Math.PI / 2;
+            threeCylinder.scale.y = 0.01;
+            threeWireframe.rotation.copy(threeCylinder.rotation);
+            threeWireframe.scale.copy(threeCylinder.scale);
+
+            window.addEventListener('resize', onThreeWindowResize, false);
+        }
+
+        function onThreeWindowResize() {
+            if (!threeCamera || !threeRenderer) return;
+            threeCamera.aspect = window.innerWidth / window.innerHeight;
+            threeCamera.updateProjectionMatrix();
+            threeRenderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        let clockHandAngle = 0;
+        function drawHudOnTexture() {
+            textureCtx.clearRect(0, 0, textureCanvas.width, textureCanvas.height);
+
+            texturePlexus.animate();
+
+            const center = textureCanvas.width / 2;
+            const radius = textureCanvas.width / 2 - 20;
+
+            textureCtx.strokeStyle = 'rgba(51, 102, 153, 0.5)';
+            textureCtx.lineWidth = 10;
+            textureCtx.beginPath();
+            textureCtx.arc(center, center, radius, 0, Math.PI * 2);
+            textureCtx.stroke();
+
+            textureCtx.lineWidth = 1;
+            for (let i = 0; i < 120; i++) {
+                const angle = (i / 120) * Math.PI * 2;
+                const startRadius = i % 5 === 0 ? radius - 20 : radius - 15;
+                textureCtx.beginPath();
+                textureCtx.moveTo(center + Math.cos(angle) * startRadius, center + Math.sin(angle) * startRadius);
+                textureCtx.lineTo(center + Math.cos(angle) * radius, center + Math.sin(angle) * radius);
+                textureCtx.stroke();
+            }
+
+            textureCtx.save();
+            textureCtx.translate(center, center);
+            textureCtx.rotate(clockHandAngle * Math.PI / 180);
+            textureCtx.strokeStyle = '#F4B400';
+            textureCtx.lineWidth = 5;
+            textureCtx.beginPath();
+            textureCtx.moveTo(0, 0);
+            textureCtx.lineTo(0, -radius * 0.8);
+            textureCtx.stroke();
+            textureCtx.restore();
+            clockHandAngle += 0.5;
+        }
+
+        function animateThreeScene() {
+            if (!threeCylinder) return;
+            threeAnimationId = requestAnimationFrame(animateThreeScene);
+
+            drawHudOnTexture();
+            threeCylinder.material.map.needsUpdate = true;
+
+            threeRenderer.render(threeScene, threeCamera);
+        }
+
+        function stopThreeScene() {
+            cancelAnimationFrame(threeAnimationId);
+        }
+
+        // --- INTERACTIVE 2D VIZ FUNCTIONS ---
+
+        const updateVizColors = () => {
+            const isLight = document.body.classList.contains('light');
+            vizColors = {
+                line: isLight ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                cylinder: isLight ? '#9ca3af' : '#4b5563',
+                chip: isLight ? '#4b5563' : '#9ca3af',
+                node: '#FBBC05',
+                text: isLight ? '#111827' : '#f9fafb',
+                glow: isLight ? '#000000' : '#ffffff',
+                handLine: '#FBBC05',
+                handGlow: 'rgba(251, 188, 5, 0.7)'
+            };
+        };
+
+        const lerp = (a, b, t) => a + (b - a) * t;
+
+        const generatePcbPaths = (scale) => {
+            pcbPaths = [
+                // Path 1: Chat Bots (Up, Left)
+                [{ x: 0, y: 0 }, { x: 0, y: -0.2 * scale }, { x: -0.5 * scale, y: -0.2 * scale }, { x: -0.5 * scale, y: -0.35 * scale }],
+                // Path 2: Visualizations (Up, Right, Up)
+                [{ x: 0, y: 0 }, { x: 0.3 * scale, y: 0 }, { x: 0.3 * scale, y: -0.45 * scale }, { x: 0.5 * scale, y: -0.45 * scale }],
+                // Path 3: Software-Based Projects (Down, Left)
+                [{ x: 0, y: 0 }, { x: 0, y: 0.25 * scale }, { x: -0.4 * scale, y: 0.25 * scale }, { x: -0.4 * scale, y: 0.45 * scale }],
+                // Path 4: Machine Learning (Right, Down)
+                [{ x: 0, y: 0 }, { x: 0.6 * scale, y: 0 }, { x: 0.6 * scale, y: 0.15 * scale }],
+                // Path 5: Data Analysis (Down, Right, Down)
+                [{ x: 0, y: 0 }, { x: 0, y: 0.1 * scale }, { x: 0.4 * scale, y: 0.1 * scale }, { x: 0.4 * scale, y: 0.35 * scale }, { x: 0.55 * scale, y: 0.35 * scale }]
+            ];
+        };
+
+        const resizeVizCanvas = () => {
+            if (!vizCanvas) return;
+            vizCanvas.width = window.innerWidth;
+            vizCanvas.height = window.innerHeight;
+            const scale = Math.min(vizCanvas.width, vizCanvas.height) * 0.8;
+            generatePcbPaths(scale);
+        };
+
+        function drawVizChip(x, y, size) {
+            if (size <= 0) return;
+            const isLight = document.body.classList.contains('light');
+            vizCtx.save();
+            vizCtx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+            vizCtx.shadowBlur = size * 0.25;
+            vizCtx.shadowOffsetX = size * 0.08;
+            vizCtx.shadowOffsetY = size * 0.08;
+
+            const bodySize = size * 0.8;
+            const bodyX = x - bodySize / 2;
+            const bodyY = y - bodySize / 2;
+
+            const bodyGradient = vizCtx.createLinearGradient(bodyX, bodyY, bodyX + bodySize, bodyY + bodySize);
+            if (!isLight) {
+                bodyGradient.addColorStop(0, '#2d3748'); bodyGradient.addColorStop(1, '#4a5568');
+            } else {
+                bodyGradient.addColorStop(0, '#718096'); bodyGradient.addColorStop(1, '#a0aec0');
+            }
+            vizCtx.fillStyle = bodyGradient;
+            vizCtx.fillRect(bodyX, bodyY, bodySize, bodySize);
+
+            vizCtx.shadowColor = 'transparent';
+            vizCtx.shadowBlur = 0; vizCtx.shadowOffsetX = 0; vizCtx.shadowOffsetY = 0;
+
+            const dieSize = bodySize * 0.5;
+            const dieX = x - dieSize / 2;
+            const dieY = y - dieSize / 2;
+
+            const dieGradient = vizCtx.createLinearGradient(dieX, dieY, dieX + dieSize, dieY + dieSize);
+            if (!isLight) {
+                dieGradient.addColorStop(0, '#1a202c'); dieGradient.addColorStop(1, '#2d3748');
+            } else {
+                dieGradient.addColorStop(0, '#4a5568'); dieGradient.addColorStop(1, '#718096');
+            }
+            vizCtx.fillStyle = dieGradient;
+            vizCtx.fillRect(dieX, dieY, dieSize, dieSize);
+
+            const highlightSize = dieSize;
+            const highlightX = dieX;
+            const highlightY = dieY;
+            const highlightGradient = vizCtx.createLinearGradient(highlightX, highlightY, highlightX + highlightSize, highlightY);
+            highlightGradient.addColorStop(0.1, 'rgba(255, 255, 255, 0.15)');
+            highlightGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+            vizCtx.fillStyle = highlightGradient;
+            vizCtx.fillRect(highlightX, highlightY, highlightSize, highlightSize);
+
+            const legLength = size * 0.2;
+            const legWidth = size * 0.04;
+            const numLegsPerSide = 5;
+
+            const pinGradient = vizCtx.createLinearGradient(0, y - size / 2, 0, y + size / 2);
+            if (!isLight) {
+                pinGradient.addColorStop(0, '#718096'); pinGradient.addColorStop(1, '#a0aec0');
+            } else {
+                pinGradient.addColorStop(0, '#a0aec0'); pinGradient.addColorStop(1, '#e2e8f0');
+            }
+            vizCtx.fillStyle = pinGradient;
+
+            for (let i = 0; i < numLegsPerSide; i++) {
+                const legOffsetRatio = (i - (numLegsPerSide - 1) / 2) / (numLegsPerSide / 2);
+                const legOffset = (bodySize / 2) * legOffsetRatio * 0.8;
+                vizCtx.fillRect(x + legOffset - legWidth / 2, bodyY - legLength, legWidth, legLength);
+                vizCtx.fillRect(x + legOffset - legWidth / 2, bodyY + bodySize, legWidth, legLength);
+                vizCtx.fillRect(bodyX - legLength, y + legOffset - legWidth / 2, legLength, legWidth);
+                vizCtx.fillRect(bodyX + bodySize, y + legOffset - legWidth / 2, legLength, legWidth);
+            }
+            vizCtx.restore();
+        }
+
+        function drawInteractiveViz(currentTime = 0) {
+            if (!vizCanvas || !vizCtx) return;
+            vizCtx.clearRect(0, 0, vizCanvas.width, vizCanvas.height);
+
+            const centerX = vizCanvas.width / 2;
+            const centerY = vizCanvas.height / 2;
+
+            const cylinderHeight = 80, cylinderWidth = 20, cylinderX = 40;
+            const lineStart = { x: cylinderX + cylinderWidth, y: centerY };
+            const moveProgress = Math.min(vizScrollPercent / 0.35, 1);
+
+            const hubPos = {
+                x: lerp(lineStart.x, centerX, moveProgress),
+                y: centerY
+            };
+
+            const startWidth = 2, endWidth = lerp(2, 8, moveProgress);
+            vizCtx.shadowBlur = 20;
+            vizCtx.shadowColor = vizColors.handGlow;
+            vizCtx.beginPath();
+            vizCtx.fillStyle = vizColors.handLine;
+            vizCtx.moveTo(lineStart.x, lineStart.y - startWidth / 2);
+            vizCtx.lineTo(hubPos.x, hubPos.y - endWidth / 2);
+            vizCtx.lineTo(hubPos.x, hubPos.y + endWidth / 2);
+            vizCtx.lineTo(lineStart.x, lineStart.y + startWidth / 2);
+            vizCtx.closePath();
+            vizCtx.fill();
+            vizCtx.shadowBlur = 0;
+
+            if (moveProgress > 0) {
+                const chipSize = lerp(0, 60, moveProgress);
+                drawVizChip(hubPos.x, hubPos.y, chipSize);
+            }
+
+            const totalBranchProgress = Math.max(0, (vizScrollPercent - 0.45)) / 0.5;
+            categoryNodes = [];
+
+            if (totalBranchProgress > 0) {
+                const numPhases = 5, phaseDuration = 1 / numPhases, nodeRadius = 8;
+                const glowProgress = Math.max(0, (vizScrollPercent - 0.6)) / 0.4;
+                const glowIntensity = lerp(0, 15, glowProgress);
+                vizCtx.shadowBlur = glowIntensity;
+                vizCtx.shadowColor = vizColors.glow;
+
+                projectData.forEach((category, i) => {
+                    const startTime = i * phaseDuration;
+                    const branchProgress = Math.min(1, Math.max(0, (totalBranchProgress - startTime) / phaseDuration));
+                    const path = pcbPaths[i];
+
+                    if (branchProgress > 0 && path) {
+                        let totalLength = 0;
+                        for (let j = 1; j < path.length; j++) {
+                            totalLength += Math.hypot(path[j].x - path[j - 1].x, path[j].y - path[j - 1].y);
+                        }
+                        const drawnLength = totalLength * branchProgress;
+                        vizCtx.beginPath();
+                        vizCtx.moveTo(hubPos.x, hubPos.y);
+                        let lengthCovered = 0;
+                        for (let j = 1; j < path.length; j++) {
+                            const segmentStart = { x: path[j - 1].x + hubPos.x, y: path[j - 1].y + hubPos.y };
+                            const segmentEnd = { x: path[j].x + hubPos.x, y: path[j].y + hubPos.y };
+                            const segmentLength = Math.hypot(segmentEnd.x - segmentStart.x, segmentEnd.y - segmentStart.y);
+                            if (lengthCovered + segmentLength >= drawnLength) {
+                                const fraction = (drawnLength - lengthCovered) / segmentLength;
+                                vizCtx.lineTo(lerp(segmentStart.x, segmentEnd.x, fraction), lerp(segmentStart.y, segmentEnd.y, fraction));
+                                break;
+                            } else {
+                                vizCtx.lineTo(segmentEnd.x, segmentEnd.y);
+                                lengthCovered += segmentLength;
+                            }
+                        }
+                        vizCtx.strokeStyle = vizColors.line;
+                        vizCtx.lineWidth = 2;
+                        vizCtx.stroke();
+
+                        lengthCovered = 0;
+                        for (let j = 1; j < path.length - 1; j++) {
+                            lengthCovered += Math.hypot(path[j].x - path[j - 1].x, path[j].y - path[j - 1].y);
+                            if (drawnLength > lengthCovered) {
+                                vizCtx.beginPath();
+                                vizCtx.arc(path[j].x + hubPos.x, path[j].y + hubPos.y, 3, 0, Math.PI * 2);
+                                vizCtx.fillStyle = vizColors.node;
+                                vizCtx.fill();
+                            }
+                        }
+
+                        if (branchProgress === 1) {
+                            const finalPoint = path[path.length - 1];
+                            categoryNodes.push({ x: finalPoint.x + hubPos.x, y: finalPoint.y + hubPos.y, radius: nodeRadius * 3, categoryIndex: i, baseRadius: nodeRadius });
+                        }
+                    }
+                });
+
+                categoryNodes.forEach(node => {
+                    const blinkFactor = (Math.sin(currentTime * 0.002) + 1) / 2;
+                    const currentGlow = 8 + blinkFactor * (25 - 8);
+                    vizCtx.shadowBlur = currentGlow;
+                    vizCtx.shadowColor = vizColors.node;
+                    vizCtx.beginPath();
+                    vizCtx.arc(node.x, node.y, node.baseRadius, 0, Math.PI * 2);
+                    vizCtx.fillStyle = vizColors.node;
+                    vizCtx.fill();
+                });
+
+                vizCtx.shadowBlur = 0;
+                const textProgress = Math.max(0, (vizScrollPercent - 0.85)) / 0.15;
+                if (textProgress > 0) {
+                    vizCtx.globalAlpha = textProgress;
+                    categoryNodes.forEach(node => {
+                        const category = projectData[node.categoryIndex];
+                        vizCtx.fillStyle = vizColors.text;
+                        vizCtx.font = '14px Inter';
+                        if (node.x > hubPos.x + 10) { vizCtx.textAlign = 'left'; }
+                        else if (node.x < hubPos.x - 10) { vizCtx.textAlign = 'right'; }
+                        else { vizCtx.textAlign = 'center'; }
+                        const textOffset = 15;
+                        let textX = node.x;
+                        if (vizCtx.textAlign === 'left') textX += textOffset;
+                        if (vizCtx.textAlign === 'right') textX -= textOffset;
+                        let textY = node.y + 4;
+                        if (vizCtx.textAlign === 'center' && node.y < hubPos.y) textY -= textOffset;
+                        if (vizCtx.textAlign === 'center' && node.y > hubPos.y) textY += textOffset / 2;
+                        vizCtx.fillText(category.name, textX, textY);
+                    });
+                    vizCtx.globalAlpha = 1;
+                }
+            }
+        }
+
+        const createProjectCards = () => {
+            projectData.forEach((category, i) => {
+                const card = document.createElement('div');
+                card.id = `card-${i}`;
+                card.className = "project-card p-4 rounded-lg shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 w-64";
+                let content = `<h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-white">${category.name}</h3><ul>`;
+                category.projects.forEach(project => {
+                    content += `<li><a href="${project.link}" target="_blank" rel="noopener noreferrer" class="block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500 dark:text-blue-400">${project.name}</a></li>`;
+                });
+                content += '</ul>';
+                card.innerHTML = content;
+                cardsContainer.appendChild(card);
+            });
+        };
+
+        const handleVizMouseMove = (event) => {
+            if (vizCanvas.style.opacity < 0.5) return;
+            const rect = vizCanvas.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left, mouseY = event.clientY - rect.top;
+            let hoveredNode = null;
+            for (const node of categoryNodes) {
+                const dist = Math.hypot(mouseX - node.x, mouseY - node.y);
+                if (dist < node.radius) { hoveredNode = node; break; }
+            }
+            if (hoveredNode) {
+                const activeCardId = `card-${hoveredNode.categoryIndex}`;
+                document.querySelectorAll('.project-card').forEach(card => {
+                    if (card.id === activeCardId) {
+                        card.classList.add('visible');
+                        const cardRect = card.getBoundingClientRect();
+                        let left = hoveredNode.x + 20, top = hoveredNode.y;
+                        if (left + cardRect.width > window.innerWidth - 20) left = hoveredNode.x - cardRect.width - 20;
+                        if (top + cardRect.height > window.innerHeight - 20) top = window.innerHeight - cardRect.height - 20;
+                        card.style.left = `${left}px`;
+                        card.style.top = `${top}px`;
+                    } else {
+                        card.classList.remove('visible');
+                    }
+                });
+            } else if (!event.target.closest('.project-card')) {
+                document.querySelectorAll('.project-card').forEach(card => card.classList.remove('visible'));
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Boot Animation Logic ---
             const bootAnimation = document.getElementById('boot-animation');
             setTimeout(() => {
                 if (bootAnimation) {
@@ -1227,9 +1893,8 @@
                     });
                 }
                 document.body.classList.remove('loading');
-            }, 5000); // Wait for the full boot sequence to finish
+            }, 5000);
 
-            // Force scroll to top on page load/refresh, overriding any URL hash
             window.addEventListener('load', () => {
                 setTimeout(() => {
                     window.scrollTo(0, 0);
@@ -1240,229 +1905,108 @@
                 history.scrollRestoration = 'manual';
             }
 
-            // --- 1. SETUP ---
             const pinnedElement = document.getElementById('pinned-element');
             const scrollContentContainer = document.getElementById('scroll-content-container');
-            const backgroundCanvas = document.getElementById('background-canvas');
+            const plexusCanvas = document.getElementById('plexus-canvas');
+            const threeCanvas = document.getElementById('three-canvas');
+            vizCanvas = document.getElementById('viz-canvas');
+            vizCtx = vizCanvas.getContext('2d');
+            cardsContainer = document.getElementById('project-cards-container');
+
             const themeToggleBtn = document.getElementById('theme-toggle');
             const darkIcon = document.getElementById('theme-toggle-dark-icon');
             const lightIcon = document.getElementById('theme-toggle-light-icon');
             const bodyEl = document.body;
 
-
-            // Force light theme on page load
-            lightIcon.classList.remove('hidden');
-            darkIcon.classList.add('hidden');
-            bodyEl.classList.add('light');
-            localStorage.setItem('color-theme', 'light');
+            // lightIcon.classList.remove('hidden');            Uncomment all 4 lines for making
+            // darkIcon.classList.add('hidden');                white as default reload
+            // bodyEl.classList.add('light');
+            // localStorage.setItem('color-theme', 'light');
 
             themeToggleBtn.addEventListener('click', function () {
                 darkIcon.classList.toggle('hidden');
                 lightIcon.classList.toggle('hidden');
+                bodyEl.classList.toggle('light');
+                localStorage.setItem('color-theme', bodyEl.classList.contains('light') ? 'light' : 'dark');
 
-                if (localStorage.getItem('color-theme')) {
-                    if (localStorage.getItem('color-theme') === 'light') {
-                        bodyEl.classList.remove('light');
-                        localStorage.setItem('color-theme', 'dark');
-                    } else {
-                        bodyEl.classList.add('light');
-                        localStorage.setItem('color-theme', 'light');
-                    }
-                } else {
-                    if (bodyEl.classList.contains('light')) {
-                        bodyEl.classList.remove('light');
-                        localStorage.setItem('color-theme', 'dark');
-                    } else {
-                        bodyEl.classList.add('light');
-                        localStorage.setItem('color-theme', 'light');
-                    }
-                }
-
-                // Update line colors based on the new theme
+                // Update colors for both visualizations
+                updateVizColors();
                 const allLines = document.querySelectorAll('#callout-lines-svg path');
                 const newLineColor = bodyEl.classList.contains('light') ? 'rgba(26, 26, 26, 0.4)' : 'rgba(255, 255, 255, 0.4)';
                 gsap.to(allLines, { attr: { stroke: newLineColor }, duration: 0.3 });
             });
 
+            updateVizColors();
+            createProjectCards();
+            resizeVizCanvas();
+            window.addEventListener('resize', resizeVizCanvas);
+            window.addEventListener('mousemove', handleVizMouseMove);
 
-            // --- 2. ASSETS & CONTENT ---
+
             const scrollContent = [
                 { title: "", description: "", align: 'right' },
                 { title: "", description: "", align: 'left' },
                 { title: "", description: "", align: 'right' },
                 { title: "", description: "", align: 'left' },
                 { title: "", description: "", align: 'right' },
+                { title: "", description: "", align: 'left' },
             ];
 
-            const svgs = {
-                hudFrame: `<svg id="hud-frame" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="glossy" cx="50%" cy="0%" r="100%" fx="50%" fy="0%"><stop offset="0%" style="stop-color:rgba(255, 255, 255, 0.4)" /><stop offset="100%" style="stop-color:rgba(255, 255, 255, 0)" /></radialGradient></defs><circle cx="100" cy="100" r="95" fill="none" stroke="#2a2a30" stroke-width="6"/><g id="tick-marks" class="hud-tick-mark" stroke-width="1" stroke-linecap="round">${[...Array(120)].map((_, i) => `<path d="M100 ${i % 5 === 0 ? 10 : 12} L100 18" transform="rotate(${i * 3}, 100, 100)"/>`).join('')}</g><g fill="none" stroke-width="4" stroke-linecap="round"><path id="arc-1" d="M 190 100 A 90 90 0 0 1 100 190" stroke="#0F9D58"/><path id="arc-2" d="M 100 190 A 90 90 0 0 1 10 100" stroke="#3367C0"/><path id="arc-3" d="M 10 100 A 90 90 0 0 1 100 10" stroke="#A33229"/><path id="arc-4" d="M 100 10 A 90 90 0 0 1 190 100" stroke="#F4B400"/></g><circle cx="100" cy="100" r="98" fill="url(#glossy)" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/></svg>`,
-                staggerDots: `<svg id="svg-stagger-dots" class="hud-content-svg" viewBox="0 0 100 100"></svg>`,
-                clockwork: `<svg id="svg-clockwork" class="hud-content-svg" viewBox="0 0 100 100"><g id="clock-ticks" class="hud-clock-tick">${[...Array(60)].map((_, i) => `<path d="M50 ${i % 5 === 0 ? 5 : 8} L50 12" stroke-width="${i % 5 === 0 ? '1.5' : '0.5'}" transform="rotate(${i * 6}, 50, 50)" />`).join('')}</g><path id="clock-hand" d="M50 50 L50 15" stroke="#F4B400" stroke-width="2" stroke-linecap="round" /></svg>`,
-                springs: `<svg id="svg-springs" class="hud-content-svg" viewBox="0 0 100 100"></svg>`,
-                finalPattern: `<svg id="svg-final-pattern" class="hud-content-svg" viewBox="0 0 100 100"></svg>`,
-            };
+            const hudFrameSVG = `<svg id="hud-frame" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="glossy" cx="50%" cy="0%" r="100%" fx="50%" fy="0%">
+                        <stop offset="0%" style="stop-color:rgba(255, 255, 255, 0.4)" />
+                        <stop offset="100%" style="stop-color:rgba(255, 255, 255, 0)" />
+                    </radialGradient>
+                </defs>
+                <circle cx="100" cy="100" r="95" fill="none" stroke="rgba(42, 42, 48, 0.5)" stroke-width="2"/>
+                <g id="tick-marks" class="hud-tick-mark" stroke-width="1" stroke-linecap="round">${[...Array(120)].map((_, i) => `<path d="M100 ${i % 5 === 0 ? 10 : 12} L100 18" transform="rotate(${i * 3}, 100, 100)"/>`).join('')}</g>
+                <g fill="none" stroke-width="4" stroke-linecap="round">
+                    <path id="arc-red" d="M 10 100 A 90 90 0 0 1 100 10" stroke="#DB4437"/>
+                    <path id="arc-yellow" d="M 100 10 A 90 90 0 0 1 190 100" stroke="#F4B400"/>
+                    <path id="arc-green" d="M 190 100 A 90 90 0 0 1 100 190" stroke="#0F9D58"/>
+                    <path id="arc-blue" d="M 100 190 A 90 90 0 0 1 10 100" stroke="#4285F4"/>
+                </g>
+                <g id="inner-clock" transform="translate(30, 30) scale(0.7 0.7)">
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(136, 136, 136, 0.3)" stroke-width="1"/>
+                    <g class="hud-clock-tick" stroke-width="2" stroke-linecap="round">${[...Array(12)].map((_, i) => `<path d="M100 25 L100 35" transform="rotate(${i * 30}, 100, 100)"/>`).join('')}</g>
+                    <g class="hud-clock-tick" stroke-width="1" stroke-linecap="round">${[...Array(60)].map((_, i) => i % 5 !== 0 ? `<path d="M100 25 L100 30" transform="rotate(${i * 6}, 100, 100)"/>` : '').join('')}</g>
+                </g>
+                <path id="clock-hand" d="M100 100 L100 40" stroke="#F4B400" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="100" cy="100" r="98" fill="url(#glossy)" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+            </svg>`;
 
             const calloutData = {
                 allSkills: {
-                    labels: [
-                        "Python", "TensorFlow", "Tableau", "Power BI", "MySQL",
-                        "NumPy", "Pandas", "Scikit-learn", "OpenCV", "NLTK",
-                        "Data Modeling", "Machine Learning", "NLP"
-                    ],
-                    positions: [
-                        { x: '75%', y: '15%' }, { x: '90%', y: '30%' }, { x: '60%', y: '25%' },
-                        { x: '85%', y: '45%' }, { x: '70%', y: '40%' }, { x: '15%', y: '55%' },
-                        { x: '25%', y: '70%' }, { x: '40%', y: '85%' }, { x: '65%', y: '75%' },
-                        { x: '80%', y: '65%' }, { x: '55%', y: '90%' }, { x: '90%', y: '80%' },
-                        { x: '35%', y: '60%' }
-                    ]
+                    labels: ["Python", "TensorFlow", "Tableau", "Power BI", "MySQL", "NumPy", "Pandas", "Scikit-learn", "OpenCV", "NLTK", "Data Modeling", "Machine Learning", "NLP"],
+                    positions: [{ x: '75%', y: '15%' }, { x: '90%', y: '30%' }, { x: '60%', y: '25%' }, { x: '85%', y: '45%' }, { x: '70%', y: '40%' }, { x: '15%', y: '55%' }, { x: '25%', y: '70%' }, { x: '40%', y: '85%' }, { x: '65%', y: '75%' }, { x: '80%', y: '65%' }, { x: '55%', y: '90%' }, { x: '90%', y: '80%' }, { x: '35%', y: '60%' }]
                 },
                 projects: {
-                    labels: [
-                        "Real-Time Sign Language Interpreter", "Educational Resource Management",
-                        "Hospital Data Analysis", "Fake News Detection", "Image Captioning System"
-                    ],
-                    urls: [
-                        "https://github.com/yogvidwankhede/Sign_Language_Interpreter",
-                        "https://github.com/yogvidwankhede/Educational-Resource-Management",
-                        "https://github.com/yogvidwankhede/EDA",
-                        "https://github.com/yogvidwankhede/Fake_News_Detection",
-                        "#"
-                    ],
-                    positions: [
-                        { x: '75%', y: '20%' }, { x: '85%', y: '40%' }, { x: '65%', y: '55%' },
-                        { x: '25%', y: '70%' }, { x: '80%', y: '85%' }
-                    ]
+                    labels: [],
+                    urls: [],
+                    positions: []
                 },
                 certifications: [
-                    {
-                        company: 'Google',
-                        logo: 'https://www.vectorlogo.zone/logos/google/google-icon.svg',
-                        credentials: [
-                            { name: 'Advanced Data Analytics Professional', url: 'https://www.coursera.org/account/accomplishments/professional-cert/2F66GDKEUNLK' }
-                        ]
-                    },
-                    {
-                        company: 'DeepLearning.AI',
-                        logo: 'https://cdn.brandfetch.io/idcuOol42D/theme/dark/symbol.svg?c=1bxid64Mup7aczewSAYMX&t=1668081047590',
-                        credentials: [
-                            { name: 'TensorFlow Developer Professional', url: 'https://www.coursera.org/account/accomplishments/professional-cert/PAUSSXCRK9YL' }
-                        ]
-                    },
-                    {
-                        company: 'Microsoft',
-                        logo: 'https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg',
-                        credentials: [
-                            { name: 'Microsoft 365 Fundamentals', url: 'https://www.coursera.org/account/accomplishments/specialization/2EUL5E7W7JNU' }
-                        ]
-                    },
-                    {
-                        company: 'J.P. Morgan',
-                        logo: 'https://cdn.brandfetch.io/idB8rdGiLv/w/200/h/200/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1727703975236',
-                        credentials: [
-                            { name: 'Quantitative Research Job Simulation', url: 'https://www.theforage.com/completion-certificates/Sj7temL583QAYpHXD/bWqaecPDbYAwSDqJy_Sj7temL583QAYpHXD_68cb1c8d15c59647ef0fd6d3_1758767942630_completion_certificate.pdf' },
-                            { name: 'Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/Sj7temL583QAYpHXD/E6McHJDKsQYh79moz_Sj7temL583QAYpHXD_68cb1c8d15c59647ef0fd6d3_1758692204442_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'Tata',
-                        logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Tata_logo.svg',
-                        credentials: [
-                            { name: 'Cybersecurity Analyst Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gmf3ypEXBj2wvfQWC_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758714476711_completion_certificate.pdf' },
-                            { name: 'Data Visualisation Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/MyXvBcppsW2FkNYCX_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758777844048_completion_certificate.pdf' },
-                            { name: 'GenAI Powered Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gMTdCXwDdLYoXZ3wG_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758863812597_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'BCG',
-                        logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/BCG_Corporate_Logo.svg',
-                        credentials: [
-                            { name: 'Data Science Job Simulation', url: 'https://www.theforage.com/completion-certificates/SKZxezskWgmFjRvj9/Tcz8gTtprzAS4xSoK_SKZxezskWgmFjRvj9_68cb1c8d15c59647ef0fd6d3_1758857325840_completion_certificate.pdf' },
-                            { name: 'GenAI Job Simulation', url: 'https://www.theforage.com/completion-certificates/SKZxezskWgmFjRvj9/gabev3vXhuACr48eb_SKZxezskWgmFjRvj9_68cb1c8d15c59647ef0fd6d3_1758884088047_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'Walmart',
-                        logo: 'https://www.vectorlogo.zone/logos/walmart/walmart-icon.svg',
-                        credentials: [
-                            { name: 'Advanced Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/prBZoAihniNijyD6d/oX6f9BbCL9kJDJzfg_prBZoAihniNijyD6d_68cb1c8d15c59647ef0fd6d3_1758710338762_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'Johnson&Johnson',
-                        logo: 'https://cdn.brandfetch.io/idBwyRkMdk/w/400/h/400/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1721633464973',
-                        credentials: [
-                            { name: 'Robotics and Controls Job Simulation', url: 'https://www.theforage.com/completion-certificates/3w79S9RRBtn9noDWZ/q8m3gpN4ETXnjapPq_3w79S9RRBtn9noDWZ_68cb1c8d15c59647ef0fd6d3_1758866617136_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'Lloyds Banking Group',
-                        logo: 'https://cdn.brandfetch.io/idGB0ZmIES/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1682688649936',
-                        credentials: [
-                            { name: 'Data Science Job Simulation', url: 'https://www.theforage.com/completion-certificates/Zbnc2o4ok6kD2NEXx/EuvC8GPjkZ6xaiP9p_Zbnc2o4ok6kD2NEXx_68cb1c8d15c59647ef0fd6d3_1758779762939_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'Deloitte',
-                        logo: 'https://cdn.brandfetch.io/idIu-Ji9Le/w/320/h/320/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1670911863379',
-                        credentials: [
-                            { name: 'Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/9PBTqmSxAf6zZTseP/io9DzWKe3PTsiS6GG_9PBTqmSxAf6zZTseP_68cb1c8d15c59647ef0fd6d3_1758809029968_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'Mastercard',
-                        logo: 'https://cdn.brandfetch.io/idFw8DodCr/theme/dark/symbol.svg?c=1bxid64Mup7aczewSAYMX&t=1721117489739',
-                        credentials: [
-                            { name: 'Cybersecurity Job Simulation', url: 'https://www.theforage.com/completion-certificates/mfxGwGDp6WkQmtmTf/vcKAB5yYAgvemepGQ_mfxGwGDp6WkQmtmTf_68cb1c8d15c59647ef0fd6d3_1758712489219_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'Electronic Arts',
-                        logo: 'https://cdn.brandfetch.io/idT4nN4-os/theme/dark/idGewYlRz-.svg?c=1bxid64Mup7aczewSAYMX&t=1758357511674',
-                        credentials: [
-                            { name: 'Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/j43dGscQHtJJ57N54/a77WE3de8qrxWferQ_j43dGscQHtJJ57N54_68cb1c8d15c59647ef0fd6d3_1758695096188_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'Quantium',
-                        logo: 'https://cdn.brandfetch.io/idKz2rVWH7/w/200/h/200/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1671600668132',
-                        credentials: [
-                            { name: 'Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/32A6DqtsbF7LbKdcq/NkaC7knWtjSbi6aYv_32A6DqtsbF7LbKdcq_68cb1c8d15c59647ef0fd6d3_1758805395283_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'Forage',
-                        logo: 'https://cdn.brandfetch.io/idV710Mm_L/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1758723297034',
-                        credentials: [
-                        { name: 'Branding & Design Job Simulation', url: 'https://www.theforage.com/completion-certificates/HgpPSsyQpzob6HEh9/GEZvgDCZaMT3rqfRr_HgpPSsyQpzob6HEh9_68cb1c8d15c59647ef0fd6d3_1758706723589_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'Asterisc-python3',
-                        logo: 'https://ugc.production.linktr.ee/FkqHcdwPRbiztlCxKyeF_geigtpU4I3u590QN?io=true&size=avatar-v3_0',
-                        credentials: [
-                            { name: 'Python-3 Programming', url: 'https://drive.google.com/file/d/169OETqm19aT5-wTkfsaMtckLV9ipf5w4/view?usp=sharing' }
-                        ]
-                    },
-                    {
-                        company: 'EAB',
-                        logo: 'https://cdn.brandfetch.io/idivkYLQU6/w/400/h/400/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1751876733701',
-                        credentials: [
-                            { name: 'GenAI for Proposal Generation Job Simulation', url: 'https://www.theforage.com/completion-certificates/PSJm5xBFZtjjf9AnA/i2nMh36aEWT7awGCa_PSJm5xBFZtjjf9AnA_68cb1c8d15c59647ef0fd6d3_1758860940395_completion_certificate.pdf' }
-                        ]
-                    },
-                    {
-                        company: 'Datacom',
-                        logo: 'https://cdn.brandfetch.io/idLi03Oj_s/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1695336646053',
-                        credentials: [
-                            { name: 'Automation Job Simulation', url: 'https://www.theforage.com/completion-certificates/gCW7Xki5Y3vNpBmnn/Nw3MzxF2wjmki7Qor_gCW7Xki5Y3vNpBmnn_68cb1c8d15c59647ef0fd6d3_1758858217488_completion_certificate.pdf' }
-                        ]
-                    },
+                    { company: 'Google', logo: 'https://www.vectorlogo.zone/logos/google/google-icon.svg', credentials: [{ name: 'Advanced Data Analytics Professional', url: 'https://www.coursera.org/account/accomplishments/professional-cert/2F66GDKEUNLK' }] },
+                    { company: 'DeepLearning.AI', logo: 'https://cdn.brandfetch.io/idcuOol42D/theme/dark/symbol.svg?c=1bxid64Mup7aczewSAYMX&t=1668081047590', credentials: [{ name: 'TensorFlow Developer Professional', url: 'https://www.coursera.org/account/accomplishments/professional-cert/PAUSSXCRK9YL' }] },
+                    { company: 'Microsoft', logo: 'https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg', credentials: [{ name: 'Microsoft 365 Fundamentals', url: 'https://www.coursera.org/account/accomplishments/specialization/2EUL5E7W7JNU' }] },
+                    { company: 'J.P. Morgan', logo: 'https://cdn.brandfetch.io/idB8rdGiLv/w/200/h/200/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1727703975236', credentials: [{ name: 'Quantitative Research Job Simulation', url: 'https://www.theforage.com/completion-certificates/Sj7temL583QAYpHXD/bWqaecPDbYAwSDqJy_Sj7temL583QAYpHXD_68cb1c8d15c59647ef0fd6d3_1758767942630_completion_certificate.pdf' }, { name: 'Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/Sj7temL583QAYpHXD/E6McHJDKsQYh79moz_Sj7temL583QAYpHXD_68cb1c8d15c59647ef0fd6d3_1758692204442_completion_certificate.pdf' }] },
+                    { company: 'Tata', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Tata_logo.svg', credentials: [{ name: 'Cybersecurity Analyst Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gmf3ypEXBj2wvfQWC_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758714476711_completion_certificate.pdf' }, { name: 'Data Visualisation Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/MyXvBcppsW2FkNYCX_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758777844048_completion_certificate.pdf' }, { name: 'GenAI Powered Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gMTdCXwDdLYoXZ3wG_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758863812597_completion_certificate.pdf' }] },
+                    { company: 'BCG', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/BCG_Corporate_Logo.svg', credentials: [{ name: 'Data Science Job Simulation', url: 'https://www.theforage.com/completion-certificates/SKZxezskWgmFjRvj9/Tcz8gTtprzAS4xSoK_SKZxezskWgmFjRvj9_68cb1c8d15c59647ef0fd6d3_1758857325840_completion_certificate.pdf' }, { name: 'GenAI Job Simulation', url: 'https://www.theforage.com/completion-certificates/SKZxezskWgmFjRvj9/gabev3vXhuACr48eb_SKZxezskWgmFjRvj9_68cb1c8d15c59647ef0fd6d3_1758884088047_completion_certificate.pdf' }] },
+                    { company: 'Walmart', logo: 'https://www.vectorlogo.zone/logos/walmart/walmart-icon.svg', credentials: [{ name: 'Advanced Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/prBZoAihniNijyD6d/oX6f9BbCL9kJDJzfg_prBZoAihniNijyD6d_68cb1c8d15c59647ef0fd6d3_1758710338762_completion_certificate.pdf' }] },
+                    { company: 'Johnson&Johnson', logo: 'https://cdn.brandfetch.io/idBwyRkMdk/w/400/h/400/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1721633464973', credentials: [{ name: 'Robotics and Controls Job Simulation', url: 'https://www.theforage.com/completion-certificates/3w79S9RRBtn9noDWZ/q8m3gpN4ETXnjapPq_3w79S9RRBtn9noDWZ_68cb1c8d15c59647ef0fd6d3_1758866617136_completion_certificate.pdf' }] },
+                    { company: 'Lloyds Banking Group', logo: 'https://cdn.brandfetch.io/idGB0ZmIES/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1682688649936', credentials: [{ name: 'Data Science Job Simulation', url: 'https://www.theforage.com/completion-certificates/Zbnc2o4ok6kD2NEXx/EuvC8GPjkZ6xaiP9p_Zbnc2o4ok6kD2NEXx_68cb1c8d15c59647ef0fd6d3_1758779762939_completion_certificate.pdf' }] },
+                    { company: 'Deloitte', logo: 'https://cdn.brandfetch.io/idIu-Ji9Le/w/320/h/320/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1670911863379', credentials: [{ name: 'Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/9PBTqmSxAf6zZTseP/io9DzWKe3PTsiS6GG_9PBTqmSxAf6zZTseP_68cb1c8d15c59647ef0fd6d3_1758809029968_completion_certificate.pdf' }] },
+                    { company: 'Mastercard', logo: 'https://cdn.brandfetch.io/idFw8DodCr/theme/dark/symbol.svg?c=1bxid64Mup7aczewSAYMX&t=1721117489739', credentials: [{ name: 'Cybersecurity Job Simulation', url: 'https://www.theforage.com/completion-certificates/mfxGwGDp6WkQmtmTf/vcKAB5yYAgvemepGQ_mfxGwGDp6WkQmtmTf_68cb1c8d15c59647ef0fd6d3_1758712489219_completion_certificate.pdf' }] },
+                    { company: 'Electronic Arts', logo: 'https://cdn.brandfetch.io/idT4nN4-os/theme/dark/idGewYlRz-.svg?c=1bxid64Mup7aczewSAYMX&t=1758357511674', credentials: [{ name: 'Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/j43dGscQHtJJ57N54/a77WE3de8qrxWferQ_j43dGscQHtJJ57N54_68cb1c8d15c59647ef0fd6d3_1758695096188_completion_certificate.pdf' }] },
+                    { company: 'Quantium', logo: 'https://cdn.brandfetch.io/idKz2rVWH7/w/200/h/200/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1671600668132', credentials: [{ name: 'Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/32A6DqtsbF7LbKdcq/NkaC7knWtjSbi6aYv_32A6DqtsbF7LbKdcq_68cb1c8d15c59647ef0fd6d3_1758805395283_completion_certificate.pdf' }] },
+                    { company: 'Forage', logo: 'https://cdn.brandfetch.io/idV710Mm_L/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1758723297034', credentials: [{ name: 'Branding & Design Job Simulation', url: 'https://www.theforage.com/completion-certificates/HgpPSsyQpzob6HEh9/GEZvgDCZaMT3rqfRr_HgpPSsyQpzob6HEh9_68cb1c8d15c59647ef0fd6d3_1758706723589_completion_certificate.pdf' }] },
+                    { company: 'Asterisc-python3', logo: 'https://ugc.production.linktr.ee/FkqHcdwPRbiztlCxKyeF_geigtpU4I3u590QN?io=true&size=avatar-v3_0', credentials: [{ name: 'Python-3 Programming', url: 'https://drive.google.com/file/d/169OETqm19aT5-wTkfsaMtckLV9ipf5w4/view?usp=sharing' }] },
+                    { company: 'EAB', logo: 'https://cdn.brandfetch.io/idivkYLQU6/w/400/h/400/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1751876733701', credentials: [{ name: 'GenAI for Proposal Generation Job Simulation', url: 'https://www.theforage.com/completion-certificates/PSJm5xBFZtjjf9AnA/i2nMh36aEWT7awGCa_PSJm5xBFZtjjf9AnA_68cb1c8d15c59647ef0fd6d3_1758860940395_completion_certificate.pdf' }] },
+                    { company: 'Datacom', logo: 'https://cdn.brandfetch.io/idLi03Oj_s/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1695336646053', credentials: [{ name: 'Automation Job Simulation', url: 'https://www.theforage.com/completion-certificates/gCW7Xki5Y3vNpBmnn/Nw3MzxF2wjmki7Qor_gCW7Xki5Y3vNpBmnn_68cb1c8d15c59647ef0fd6d3_1758858217488_completion_certificate.pdf' }] },
                 ]
             };
 
-
-            // --- 3. DYNAMIC CONTENT INJECTION ---
             let contentHTML = '';
             scrollContent.forEach(content => {
                 const alignClass = content.align === 'left' ? 'justify-start' : 'justify-end';
@@ -1471,163 +2015,41 @@
             scrollContentContainer.innerHTML = contentHTML;
             const contentSections = document.querySelectorAll('.content-section');
 
-            // --- 4. CANVAS & ANIMATION SETUP ---
-            let sciFiAnimation, backgroundAnimation;
+            function setupInitialHUD() {
+                pinnedElement.innerHTML = hudFrameSVG;
 
-            function createPlexusAnimation(canvas, particleCount, maxDist, color) {
-                const ctx = canvas.getContext('2d');
-                let particles = [];
-                let animationId;
-                const mouse = { x: undefined, y: undefined, radius: 150 };
-
-                let mouseMoveListener, mouseOutListener;
-
-                function hexToRgb(hex) {
-                    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-                    return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
-                }
-                const rgbColor = hexToRgb(color);
-
-                function resizeCanvas() {
-                    if (canvas.id === 'sci-fi-canvas') {
-                        const size = pinnedElement.clientWidth * 0.8;
-                        canvas.width = size;
-                        canvas.height = size;
-                    } else {
-                        canvas.width = window.innerWidth;
-                        canvas.height = window.innerHeight;
-                    }
-                }
-                resizeCanvas();
-                window.addEventListener('resize', resizeCanvas);
-
-                mouseMoveListener = (event) => {
-                    const rect = canvas.getBoundingClientRect();
-                    mouse.x = event.clientX - rect.left;
-                    mouse.y = event.clientY - rect.top;
-                };
-                mouseOutListener = () => {
-                    mouse.x = undefined;
-                    mouse.y = undefined;
-                };
-                window.addEventListener('mousemove', mouseMoveListener);
-                window.addEventListener('mouseout', mouseOutListener);
-
-                class Particle {
-                    constructor() {
-                        this.x = Math.random() * canvas.width;
-                        this.y = Math.random() * canvas.height;
-                        this.vx = Math.random() * 0.4 - 0.2;
-                        this.vy = Math.random() * 0.4 - 0.2;
-                        this.radius = 1.8;
-                        this.density = (Math.random() * 20) + 5;
-                    }
-                    update() {
-                        if (mouse.x !== undefined && mouse.y !== undefined) {
-                            let dx = mouse.x - this.x;
-                            let dy = mouse.y - this.y;
-                            let distance = Math.sqrt(dx * dx + dy * dy);
-                            if (distance < mouse.radius) {
-                                const forceDirectionX = dx / distance;
-                                const forceDirectionY = dy / distance;
-                                const force = (mouse.radius - distance) / mouse.radius;
-                                const directionX = forceDirectionX * force * this.density;
-                                const directionY = forceDirectionY * force * this.density;
-                                this.x -= directionX;
-                                this.y -= directionY;
-                            }
-                        }
-                        this.x += this.vx;
-                        this.y += this.vy;
-                        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-                    }
-                    draw() {
-                        ctx.beginPath();
-                        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                        ctx.fillStyle = color;
-                        ctx.fill();
-                    }
-                }
-                for (let i = 0; i < particleCount; i++) { particles.push(new Particle()); }
-
-                function connectParticles() {
-                    for (let i = 0; i < particles.length; i++) {
-                        for (let j = i; j < particles.length; j++) {
-                            const dx = particles[i].x - particles[j].x;
-                            const dy = particles[i].y - particles[j].y;
-                            const dist = Math.sqrt(dx * dx + dy * dy);
-                            if (dist < maxDist && rgbColor) {
-                                ctx.beginPath();
-                                ctx.moveTo(particles[i].x, particles[i].y);
-                                ctx.lineTo(particles[j].x, particles[j].y);
-                                ctx.strokeStyle = `rgba(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b}, ${1 - dist / maxDist})`;
-                                ctx.lineWidth = 0.6;
-                                ctx.stroke();
-                            }
-                        }
-                    }
-                }
-
-                function animate() {
-                    if (!ctx) return;
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    particles.forEach(p => { p.update(); p.draw(); });
-                    connectParticles();
-                    animationId = requestAnimationFrame(animate);
-                }
-                animate();
-
-                return {
-                    stop: () => {
-                        cancelAnimationFrame(animationId);
-                        window.removeEventListener('mousemove', mouseMoveListener);
-                        window.removeEventListener('mouseout', mouseOutListener);
-                    },
-                    start: animate,
-                    canvas: canvas
-                };
-            }
-
-            function setupPinnedElements() {
                 const sciFiCanvas = document.createElement('canvas');
                 sciFiCanvas.id = 'sci-fi-canvas';
-
-                pinnedElement.innerHTML = svgs.hudFrame;
+                sciFiCanvas.style.width = '70%';
+                sciFiCanvas.style.height = '70%';
+                sciFiCanvas.style.zIndex = '-1';
                 pinnedElement.appendChild(sciFiCanvas);
-                pinnedElement.insertAdjacentHTML('beforeend', svgs.staggerDots + svgs.clockwork + svgs.springs + svgs.finalPattern);
 
-                sciFiAnimation = createPlexusAnimation(sciFiCanvas, 80, 100, '#336699');
+                setTimeout(() => {
+                    const rect = sciFiCanvas.getBoundingClientRect();
+                    sciFiCanvas.width = rect.width;
+                    sciFiCanvas.height = rect.height;
 
-                const children = gsap.utils.toArray(pinnedElement.children).filter(el => el.id !== 'hud-frame' && el.id !== 'sci-fi-canvas');
-                gsap.set(children, { opacity: 0 });
+                    const containedPlexus = createContainedPlexus(sciFiCanvas, 60, 80, '#336699');
 
-                const setupDotGrid = (svgId, color) => {
-                    const svg = document.getElementById(svgId);
-                    if (!svg) return;
-                    const gridSize = 13;
-                    for (let i = 0; i < gridSize; i++) {
-                        for (let j = 0; j < gridSize; j++) {
-                            const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                            const dist = Math.sqrt(Math.pow(i - (gridSize - 1) / 2, 2) + Math.pow(j - (gridSize - 1) / 2, 2));
-                            if (dist < gridSize / 2) {
-                                gsap.set(el, { attr: { cx: 15 + i * 6, cy: 15 + j * 6, r: 2.5 }, fill: color });
-                                svg.appendChild(el);
-                            }
-                        }
+                    function animateHUD() {
+                        const ctx = sciFiCanvas.getContext('2d');
+                        if (!ctx) return;
+                        ctx.clearRect(0, 0, sciFiCanvas.width, sciFiCanvas.height);
+                        containedPlexus.animate();
+                        requestAnimationFrame(animateHUD);
                     }
-                };
+                    animateHUD();
+                }, 100);
 
-                setupDotGrid('svg-stagger-dots', '#DB4437');
-                setupDotGrid('svg-final-pattern', '#996633');
-
-                const springsSVG = document.getElementById('svg-springs');
-                const numDots = 5;
-                for (let i = 0; i < numDots; i++) {
-                    const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    gsap.set(el, { attr: { cx: 50, cy: 50, r: 5 }, fill: '#336699' });
-                    springsSVG.appendChild(el);
-                }
+                const arcs = ["#arc-red", "#arc-yellow", "#arc-green", "#arc-blue"];
+                arcs.forEach(arc => {
+                    const path = document.querySelector(arc);
+                    if (path) {
+                        const length = path.getTotalLength();
+                        gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+                    }
+                });
             }
 
             const createCalloutElements = (data) => {
@@ -1657,11 +2079,18 @@
                     const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 
                     const updatePath = () => {
-                        const center = pinnedElement.getBoundingClientRect();
+                        const isProjectsSection = tl.scrollTrigger.progress > 0.25;
+                        const center = isProjectsSection ?
+                            { left: window.innerWidth * 0.25, top: window.innerHeight / 2 } :
+                            pinnedElement.getBoundingClientRect();
+
+                        const centerElX = isProjectsSection ? center.left : center.left + center.width / 2;
+                        const centerElY = isProjectsSection ? center.top : center.top + center.height / 2;
+
                         const labelEl = wrapper.getBoundingClientRect();
                         const svgRect = linesSVG.getBoundingClientRect();
-                        const sx = center.left + center.width / 2 - svgRect.left;
-                        const sy = center.top + center.height / 2 - svgRect.top;
+                        const sx = centerElX - svgRect.left;
+                        const sy = centerElY - svgRect.top;
                         const ex = labelEl.left + (parseFloat(data.positions[i].x) < 50 ? labelEl.width : 0) - svgRect.left;
                         const ey = labelEl.top + labelEl.height / 2 - svgRect.top;
                         const d = `M ${sx} ${sy} L ${ex} ${ey}`;
@@ -1672,6 +2101,8 @@
 
                     setTimeout(updatePath, 100);
                     window.addEventListener('resize', updatePath);
+                    ScrollTrigger.addEventListener("refresh", updatePath);
+                    gsap.ticker.add(updatePath);
 
                     const initialLineColor = document.body.classList.contains('light') ? 'rgba(26, 26, 26, 0.4)' : 'rgba(255, 255, 255, 0.4)';
                     gsap.set(line, { attr: { 'stroke-width': 0.5, stroke: initialLineColor } });
@@ -1708,38 +2139,26 @@
                 });
             };
 
-            // --- 5. GSAP SCROLL-DRIVEN ANIMATION ---
             gsap.registerPlugin(ScrollTrigger, Draggable, ScrollToPlugin);
-            setupPinnedElements();
+
+            setupInitialHUD();
+            initThreeScene();
 
             const allSkillsCallouts = createCalloutElements(calloutData.allSkills);
             const projectCallouts = createCalloutElements(calloutData.projects);
-
             createCertificationGrid(calloutData.certifications);
 
             gsap.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'hidden' });
             gsap.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'hidden' });
 
-
-            const sciFiCanvas = document.getElementById('sci-fi-canvas');
-            const svgStaggerDots = document.getElementById('svg-stagger-dots');
-            const svgClockwork = document.getElementById('svg-clockwork');
-            const svgClockHand = document.getElementById('clock-hand');
-            const svgSprings = document.getElementById('svg-springs');
-            const svgSpringDots = gsap.utils.toArray('#svg-springs circle');
-            const svgFinalPattern = document.getElementById('svg-final-pattern');
-            const colorArcs = gsap.utils.toArray("#arc-1, #arc-2, #arc-3, #arc-4");
             const skillsTitle = document.getElementById('skills-title');
             const projectsTitle = document.getElementById('projects-title');
 
-            colorArcs.forEach(arc => {
-                const len = arc.getTotalLength();
-                arc.style.strokeDasharray = len;
-                arc.style.strokeDashoffset = len;
-            });
-
             gsap.set(contentSections[0], { opacity: 1 });
+            gsap.set(plexusCanvas, { clipPath: 'circle(27.5vmin at 50% 50%)' });
 
+
+            let plexusAnimation;
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: "#pinned-container",
@@ -1747,21 +2166,39 @@
                     end: "bottom bottom",
                     scrub: 1,
                     onEnter: () => {
-                        sciFiAnimation.stop();
-                        backgroundAnimation = createPlexusAnimation(backgroundCanvas, 200, 120, '#336699');
+                        plexusAnimation = createPlexusAnimation(plexusCanvas, 200, 120, '#336699');
+                        plexusAnimation.start();
+                    },
+                    onLeave: () => {
+                        if (plexusAnimation) plexusAnimation.stop();
+                        stopThreeScene();
+                    },
+                    onEnterBack: () => {
+                        if (!plexusAnimation) {
+                            plexusAnimation = createPlexusAnimation(plexusCanvas, 200, 120, '#336699');
+                            plexusAnimation.start();
+                        }
                     },
                     onLeaveBack: () => {
-                        if (backgroundAnimation) {
-                            backgroundAnimation.stop();
-                            backgroundCanvas.getContext('2d').clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
-                        }
-                        sciFiAnimation = createPlexusAnimation(document.getElementById('sci-fi-canvas'), 80, 100, '#336699');
-                    },
+                        if (plexusAnimation) plexusAnimation.stop();
+                        stopThreeScene();
+                    }
                 },
             });
 
-            const sectionDuration = 1 / (contentSections.length - 1);
-            const p = (index) => index * sectionDuration;
+            // Define 6 phases in the scroll animation
+            const numPhases = 6;
+            const p = (index) => index * (1 / numPhases);
+
+            const hudAnimationEndTime = p(1.5);
+
+            tl.to("#clock-hand", { rotation: 360, transformOrigin: "100 100", ease: "none", duration: hudAnimationEndTime }, 0);
+
+            const arcFillDuration = hudAnimationEndTime / 4;
+            tl.to("#arc-red", { strokeDashoffset: 0, ease: "none", duration: arcFillDuration }, 0);
+            tl.to("#arc-yellow", { strokeDashoffset: 0, ease: "none", duration: arcFillDuration }, arcFillDuration * 1);
+            tl.to("#arc-green", { strokeDashoffset: 0, ease: "none", duration: arcFillDuration }, arcFillDuration * 2);
+            tl.to("#arc-blue", { strokeDashoffset: 0, ease: "none", duration: arcFillDuration }, arcFillDuration * 3);
 
             contentSections.forEach((section, index) => {
                 tl.to(section, { opacity: 1, duration: p(0.1) }, p(index));
@@ -1770,52 +2207,74 @@
                 }
             });
 
-            const circleSize = (pinnedElement.getBoundingClientRect().width / window.innerWidth) * 50;
-            tl.to(sciFiCanvas, { opacity: 0, duration: p(0.2) }, p(0))
-                .fromTo(backgroundCanvas,
-                    { clipPath: `circle(${circleSize}vw at 50% 50%)`, opacity: 1 },
-                    { clipPath: `circle(100vw at 50% 50%)`, duration: p(1), ease: 'power2.inOut' },
-                    p(0)
-                );
+            // --- Phase 1: Domain Expertise ---
+            tl.to('#sci-fi-canvas', { opacity: 0, duration: p(0.2) }, 0);
+            tl.to(plexusCanvas, { opacity: 1, pointerEvents: 'auto', duration: p(0.1) }, 0);
+            tl.to(plexusCanvas, { clipPath: `circle(100vmax at 50% 50%)`, duration: p(1), ease: 'power2.inOut' }, 0);
+            tl.to(skillsTitle, { opacity: 1, x: 0, duration: p(0.5) }, p(0.5));
+            tl.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'visible' }, p(0.5));
+            tl.to(allSkillsCallouts.lines, { strokeDashoffset: 0, duration: p(1) }, p(0.5));
+            tl.to(allSkillsCallouts.labels, { opacity: 1, duration: p(1) }, p(0.5));
 
-            // --- MODIFIED ANIMATION TIMELINE ---
+            // --- Phase 2: Transition to 3D cylinder ---
+            const transitionTo3DStart = p(1.5);
+            tl.to(skillsTitle, { opacity: 0, x: -30, duration: p(0.5) }, transitionTo3DStart);
+            tl.to(allSkillsCallouts.labels, { opacity: 0, duration: p(0.5) }, transitionTo3DStart);
+            tl.to(allSkillsCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, transitionTo3DStart);
+            tl.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'hidden' }, transitionTo3DStart + p(0.5));
+            tl.to(plexusCanvas, { opacity: 0, duration: p(0.5) }, transitionTo3DStart);
+            tl.to(pinnedElement, { opacity: 0, duration: p(0.5) }, transitionTo3DStart);
 
-            // 1. Color Arcs and Clock Animation - Run together from p(0) to p(1)
-            tl.to(colorArcs, { strokeDashoffset: 0, duration: p(1), stagger: p(0.25) }, 0);
-            tl.to(svgClockwork, { opacity: 1, duration: p(0.1) }, 0)
-                .to(svgClockHand, { rotation: 1080, transformOrigin: '50% 50%', duration: p(1) }, 0);
+            // --- Phase 3: Highlighted Work (3D Cylinder) ---
+            const cylinderStartTime = p(2);
+            tl.call(animateThreeScene, [], cylinderStartTime);
+            tl.to(threeCanvas, { opacity: 1, duration: p(0.5), onStart: () => threeCanvas.style.pointerEvents = 'auto' }, cylinderStartTime);
+            tl.to([threeCylinder.rotation, threeWireframe.rotation], { x: 0, duration: p(1), ease: 'power1.inOut' }, cylinderStartTime);
+            tl.to([threeCylinder.scale, threeWireframe.scale], { y: 1, duration: p(1), ease: 'power1.inOut' }, cylinderStartTime);
+            tl.to(projectsTitle, { opacity: 1, x: 0, duration: p(0.5) }, cylinderStartTime);
+            tl.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'visible' }, cylinderStartTime);
+            tl.to(projectCallouts.lines, { strokeDashoffset: 0, duration: p(1), stagger: 0.1 }, cylinderStartTime);
+            tl.to(projectCallouts.labels, { opacity: 1, duration: p(1), stagger: 0.1 }, cylinderStartTime);
+            tl.to([threeCylinder.position, threeWireframe.position], { x: -6, duration: p(2), ease: 'power2.inOut' }, cylinderStartTime);
+            // --- Phase 4: Highlighted Work (2D Interactive Viz) ---
+            const vizStartTime = p(4);
+            // Fade out previous section
+            // tl.to(projectsTitle, { opacity: 0, x: -30, duration: p(0.5) }, vizStartTime);
+            tl.to(projectCallouts.labels, { opacity: 0, duration: p(0.5) }, vizStartTime);
+            tl.to(projectCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, vizStartTime);
+            tl.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'hidden' }, vizStartTime + p(0.5));
+            // tl.to(threeCanvas, { opacity: 0, duration: p(0.5), onComplete: () => threeCanvas.style.pointerEvents = 'none' }, vizStartTime);
+            // tl.call(stopThreeScene, [], vizStartTime + p(0.5));
+            // Fade in new section
+            tl.to(vizCanvas, { opacity: 1, pointerEvents: 'auto', duration: p(0.2) }, vizStartTime);
+            // Animate the new visualization using a proxy object
+            let vizProgress = { value: 0 };
+            tl.to(vizProgress, {
+                value: 1,
+                duration: p(1), // Give it one full section of scroll
+                ease: 'none',
+                onUpdate: () => {
+                    vizScrollPercent = vizProgress.value; // Link GSAP progress to the viz's variable
+                    drawInteractiveViz(performance.now()); // Call the drawing function
+                    if (vizScrollPercent > 0.35) {
+                        document.body.classList.add('board-background');
+                    } else {
+                        document.body.classList.remove('board-background');
+                    }
+                }
+            }, vizStartTime);
 
-            // 2. Skills Section - Starts at p(1)
-            const skillsStartTime = p(1);
-            const skillsEndTime = p(2);
-            tl.to(svgClockwork, { opacity: 0, duration: p(0.1) }, skillsStartTime); // Fade out clock as skills start
-            tl.to(skillsTitle, { opacity: 1, x: 0, duration: p(0.5) }, skillsStartTime);
-            tl.to(skillsTitle, { opacity: 0, x: -30, duration: p(0.5) }, skillsEndTime);
-            tl.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'visible' }, skillsStartTime);
-            tl.to(allSkillsCallouts.lines, { strokeDashoffset: 0, duration: p(1) }, skillsStartTime);
-            tl.to(allSkillsCallouts.labels, { opacity: 1, duration: p(1) }, skillsStartTime);
-            tl.to(allSkillsCallouts.labels, { opacity: 0, duration: p(0.5) }, skillsEndTime);
-            tl.to(allSkillsCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, skillsEndTime);
-            tl.set(allSkillsCallouts.labels.concat(allSkillsCallouts.lines), { visibility: 'hidden' }, skillsEndTime + p(0.5));
 
-            // 3. Projects Section
-            const projectsStartTime = p(2);
-            const projectsEndTime = p(4);
-            tl.to(projectsTitle, { opacity: 1, x: 0, duration: p(0.5) }, projectsStartTime);
-            tl.to(projectsTitle, { opacity: 0, x: -30, duration: p(0.5) }, projectsEndTime);
-            tl.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'visible' }, projectsStartTime);
-            tl.to(projectCallouts.lines, { strokeDashoffset: 0, duration: p(1), stagger: 0.1 }, projectsStartTime);
-            tl.to(projectCallouts.labels, { opacity: 1, duration: p(1), stagger: 0.1 }, projectsStartTime);
-            tl.to(projectCallouts.labels, { opacity: 0, duration: p(0.5) }, projectsEndTime);
-            tl.to(projectCallouts.lines, { strokeDashoffset: (i, el) => el.getTotalLength(), duration: p(0.5) }, projectsEndTime);
-            tl.set(projectCallouts.labels.concat(projectCallouts.lines), { visibility: 'hidden' }, projectsEndTime + p(0.5));
+            // --- Phase 5: Fade Out ---
+            const fadeOutStart = p(5);
+            tl.to(projectsTitle, { opacity: 0, x: -30, duration: p(0.5) }, fadeOutStart); // <-- Add this line
+            tl.to(vizCanvas, {
+                opacity: 0, duration: p(0.5), onComplete: () => {
+                    vizCanvas.style.pointerEvents = 'none';
+                    document.body.classList.remove('board-background');
+                }
+            }, fadeOutStart);
 
-            // 4. Final Pattern Animation
-            tl.to(svgFinalPattern, { opacity: 1, duration: p(0.1) }, p(4))
-                .from(gsap.utils.toArray('#svg-final-pattern circle'), { scale: 0, stagger: { grid: 'auto', from: 'center', amount: p(0.8) }, duration: p(1), }, p(4));
-
-
-            // --- Standalone Certifications Section Animation ---
             gsap.from("#certifications-title", {
                 scrollTrigger: { trigger: "#certifications", start: "top 80%", toggleActions: "play none none none" },
                 opacity: 0, y: 50, duration: 0.6
@@ -1825,7 +2284,6 @@
                 opacity: 0, scale: 0.5, y: 50, duration: 0.5, stagger: 0.1
             });
 
-            // --- Custom Scrollbar Logic ---
             const thumb = document.getElementById('custom-scrollbar-thumb');
             const track = document.getElementById('custom-scrollbar-track');
 
@@ -1853,7 +2311,6 @@
                 }
             });
 
-            // --- Roaming Bot & Chat Logic (NEW) ---
             const bot = document.getElementById('roaming-bot');
             const chatWindow = document.getElementById('chat-window');
             const closeChatBtn = document.getElementById('close-chat');
@@ -1945,11 +2402,9 @@
 
             closeChatBtn.addEventListener('click', closeChat);
 
-            // Start the bot animation
             setNewTargetPosition();
             animateBot();
 
-            // --- Existing Chat Form Logic ---
             const addMessage = (message, sender, messageId = null) => {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('chat-message');
@@ -1974,7 +2429,7 @@
             };
 
             const getGeminiResponse = async (userInput) => {
-                const apiKey = ""; // IMPORTANT: Left blank intentionally. Canvas will provide one.
+                const apiKey = "";
                 if (!apiKey) {
                     return "I'm sorry, but my connection isn't configured. The developer needs to add an API key.";
                 }
@@ -2037,7 +2492,6 @@
                 addMessage("Hello! I’m your Portfolio Assistant — here to provide insights about my skills, projects, and professional experience. Ask me anything to explore my work.", 'bot');
             }, 2000);
 
-            // --- Scroll to Top Logic ---
             const scrollToTopBtn = document.getElementById('scrollToTopBtn');
 
             window.addEventListener('scroll', () => {
@@ -2052,7 +2506,6 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            // --- Typewriter Effect Logic ---
             const typewriterText = document.getElementById('typewriter-text');
             if (typewriterText) {
                 const words = ["Data Science Expert.", "AI & Machine Learning Engineer.", "Problem Solver."];
@@ -2089,7 +2542,6 @@
                 }
             }
 
-            // --- Snow Effect Logic ---
             const snowCanvas = document.getElementById('snow-canvas');
             if (snowCanvas) {
                 const ctx = snowCanvas.getContext('2d');
@@ -2147,7 +2599,6 @@
                 setInterval(drawFlakes, 30);
             }
 
-            // --- EmailJS Contact Form Logic ---
             (function () {
                 emailjs.init('7l_R7rukU6L1mQggO');
             })();
@@ -2213,6 +2664,7 @@
                         this.ascendPower = -10; this.gravity = 0.4;
                     }
                     draw() {
+
                         const droneColor = document.body.classList.contains('light') ? '#1a1a1a' : '#f0f0f0';
                         gameCtx.fillStyle = droneColor;
                         gameCtx.fillRect(this.x, this.y + 5, this.width, this.height - 10);
@@ -2266,7 +2718,7 @@
                 }
                 function drawGround() {
                     gameCtx.beginPath();
-                    gameCtx.moveTo(0, GROUND_Y);
+                    gameCtx.moveTo(0, GROUND_Y); // <--- Corrected line
                     gameCtx.lineTo(gameCanvas.width, GROUND_Y);
                     gameCtx.strokeStyle = document.body.classList.contains('light') ? 'rgba(26, 26, 26, 0.5)' : 'rgba(240, 240, 240, 0.5)';
                     gameCtx.lineWidth = 2;
