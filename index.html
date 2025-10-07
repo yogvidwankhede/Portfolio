@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yogvid Wankhede: Portfolio</title>
+    <title>Portfolio: Yogvid Wankhede</title>
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M 14.65 85.35 A 45 45 0 1 1 85.35 14.65' fill='none' stroke='%236B7280' stroke-width='8'/><path d='M 14.65 85.35 A 45 45 0 0 0 85.35 14.65' fill='none' stroke='%23336699' stroke-width='8'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='Unica One, cursive' font-size='50' font-weight='400'><tspan fill='%23336699'>Y</tspan><tspan fill='%236B7280'>W</tspan></text></svg>">
 
@@ -96,14 +96,12 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            /* Default dark theme background */
             background-image: url('https://raw.githubusercontent.com/yogvidwankhede/portfolio/main/images/Night.png');
         }
 
         body.light #intro-hero {
             /* Light theme background */
             background-image: url('https://raw.githubusercontent.com/yogvidwankhede/portfolio/main/images/Day.png');
-            /* background-image: url('C:/Users/Asus/Downloads/My Portfolio Website/Main/images/og.IPG'); */
         }
 
         #snow-canvas {
@@ -742,7 +740,7 @@
         }
 
         body.light .glass-morphism {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(0, 0, 0, 0.1);
@@ -911,10 +909,8 @@
         }
     </style>
 </head>
-<!-- <body class="antialiased loading light"> -->
-<!-- For loading in Light mode when clicked on reload , also uncommnt 4 lines from line 1920-->
 
-<body class="antialiased loading light">
+<body class="antialiased loading">
 
 
     <!-- Google Tag Manager (noscript) -->
@@ -984,7 +980,7 @@
                         d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                 </svg>
             </a>
-            <a href="#contact"
+            <a href="#contact" id="contact-link-header"
                 class="bg-[#336699] text-white px-4 py-2 rounded-full bg-opacity-40 transition text-sm font-medium">Contact</a>
         </nav>
     </header>
@@ -995,7 +991,7 @@
         <section id="intro-hero"
             class="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-20 relative overflow-hidden">
             <canvas id="snow-canvas"></canvas>
-            <div class="md:w-1/2 text-center md:text-left space-y-6 relative z-10">
+            <div class="md:w-1/2 text-center md:text-left relative z-10 glass-morphism p-8 rounded-lg">
                 <p class="uppercase tracking-widest text-gray-400 text-sm">
                     Welcome to my world
                 </p>
@@ -1007,19 +1003,20 @@
                     <span id="typewriter-cursor" class="border-l-2 border-gray-400"></span>
                 </div>
                 <p class="text-gray-300 max-w-md mx-auto md:mx-0">
-                    I specialize in extracting meaningful insights from complex datasets and
-                    building intelligent systems. From predictive modeling to deep learning
-                    and NLP, I love applying data-driven solutions to real-world challenges.
+                    I specialize in Artificial Intelligence and Machine Learning, transforming complex data into
+                    intelligent systems and actionable insights.
+                    My expertise spans predictive modeling, deep learning, and NLP to deliver
+                    data-driven solutions with real-world impact.
                 </p>
 
                 <div class="flex justify-center md:justify-start space-x-4 pt-4">
-                    <a href="#certifications"
-                        class="bg-[#336699] hover:bg-[#29527a] text-white px-6 py-2 rounded-full transition">
+                    <a href="#certifications" id="view-credentials-link"
+                        class="border border-[#336699] hover:bg-[#336699] hover:text-white px-6 py-2 rounded-full transition">
                         View Credentials
                     </a>
-                    <a href="#contact"
+                    <a href="#projects-title" id="highlighted-work-link"
                         class="border border-[#336699] hover:bg-[#336699] hover:text-white px-6 py-2 rounded-full transition">
-                        Contact Me
+                        Highlighted Work
                     </a>
                 </div>
             </div>
@@ -1933,10 +1930,7 @@
             const lightIcon = document.getElementById('theme-toggle-light-icon');
             const bodyEl = document.body;
 
-            // lightIcon.classList.remove('hidden');            Uncomment all 4 lines for making
-            // darkIcon.classList.add('hidden');                white as default reload
-            // bodyEl.classList.add('light');
-            // localStorage.setItem('color-theme', 'light');
+
 
             themeToggleBtn.addEventListener('click', function () {
                 darkIcon.classList.toggle('hidden');
@@ -1950,6 +1944,48 @@
                 const newLineColor = bodyEl.classList.contains('light') ? 'rgba(26, 26, 26, 0.4)' : 'rgba(255, 255, 255, 0.4)';
                 gsap.to(allLines, { attr: { stroke: newLineColor }, duration: 0.3 });
             });
+
+            const highlightedWorkLink = document.getElementById('highlighted-work-link');
+            if (highlightedWorkLink) {
+                highlightedWorkLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const scrollTrigger = tl.scrollTrigger;
+                    const start = scrollTrigger.start;
+                    const end = scrollTrigger.end;
+                    const totalScroll = end - start;
+                    const projectsStartScroll = start + totalScroll * (p(5.50002) / p(numPhases));
+
+                    gsap.to(window, {
+                        scrollTo: { y: projectsStartScroll, autoKill: false },
+                        duration: 1.5,
+                        ease: 'power2.inOut'
+                    });
+                });
+            }
+
+            const viewCredentialsLink = document.getElementById('view-credentials-link');
+            if (viewCredentialsLink) {
+                viewCredentialsLink.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    gsap.to(window, {
+                        scrollTo: { y: "#certifications", autoKill: false, offsetY: 100 },
+                        duration: 1.5,
+                        ease: 'power2.inOut'
+                    });
+                });
+            }
+
+            const contactLinkHeader = document.getElementById('contact-link-header');
+            if (contactLinkHeader) {
+                contactLinkHeader.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    gsap.to(window, {
+                        scrollTo: { y: "#contact", autoKill: false },
+                        duration: 1.5,
+                        ease: 'power2.inOut'
+                    });
+                });
+            }
 
             updateVizColors();
             createProjectCards();
@@ -2002,23 +2038,158 @@
                     positions: []
                 },
                 certifications: [
-                    { company: 'Google', logo: 'https://www.vectorlogo.zone/logos/google/google-icon.svg', credentials: [{ name: 'Advanced Data Analytics Professional', url: 'https://www.coursera.org/account/accomplishments/professional-cert/2F66GDKEUNLK' }] },
-                    { company: 'DeepLearning.AI', logo: 'https://cdn.brandfetch.io/idcuOol42D/theme/dark/symbol.svg?c=1bxid64Mup7aczewSAYMX&t=1668081047590', credentials: [{ name: 'TensorFlow Developer Professional', url: 'https://www.coursera.org/account/accomplishments/professional-cert/PAUSSXCRK9YL' }] },
-                    { company: 'Microsoft', logo: 'https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg', credentials: [{ name: 'Microsoft 365 Fundamentals', url: 'https://www.coursera.org/account/accomplishments/specialization/2EUL5E7W7JNU' }] },
-                    { company: 'J.P. Morgan', logo: 'https://cdn.brandfetch.io/idB8rdGiLv/w/200/h/200/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1727703975236', credentials: [{ name: 'Quantitative Research Job Simulation', url: 'https://www.theforage.com/completion-certificates/Sj7temL583QAYpHXD/bWqaecPDbYAwSDqJy_Sj7temL583QAYpHXD_68cb1c8d15c59647ef0fd6d3_1758767942630_completion_certificate.pdf' }, { name: 'Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/Sj7temL583QAYpHXD/E6McHJDKsQYh79moz_Sj7temL583QAYpHXD_68cb1c8d15c59647ef0fd6d3_1758692204442_completion_certificate.pdf' }] },
-                    { company: 'Tata', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Tata_logo.svg', credentials: [{ name: 'Cybersecurity Analyst Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gmf3ypEXBj2wvfQWC_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758714476711_completion_certificate.pdf' }, { name: 'Data Visualisation Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/MyXvBcppsW2FkNYCX_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758777844048_completion_certificate.pdf' }, { name: 'GenAI Powered Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gMTdCXwDdLYoXZ3wG_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758863812597_completion_certificate.pdf' }] },
-                    { company: 'BCG', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/BCG_Corporate_Logo.svg', credentials: [{ name: 'Data Science Job Simulation', url: 'https://www.theforage.com/completion-certificates/SKZxezskWgmFjRvj9/Tcz8gTtprzAS4xSoK_SKZxezskWgmFjRvj9_68cb1c8d15c59647ef0fd6d3_1758857325840_completion_certificate.pdf' }, { name: 'GenAI Job Simulation', url: 'https://www.theforage.com/completion-certificates/SKZxezskWgmFjRvj9/gabev3vXhuACr48eb_SKZxezskWgmFjRvj9_68cb1c8d15c59647ef0fd6d3_1758884088047_completion_certificate.pdf' }] },
-                    { company: 'Walmart', logo: 'https://www.vectorlogo.zone/logos/walmart/walmart-icon.svg', credentials: [{ name: 'Advanced Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/prBZoAihniNijyD6d/oX6f9BbCL9kJDJzfg_prBZoAihniNijyD6d_68cb1c8d15c59647ef0fd6d3_1758710338762_completion_certificate.pdf' }] },
-                    { company: 'Johnson&Johnson', logo: 'https://cdn.brandfetch.io/idBwyRkMdk/w/400/h/400/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1721633464973', credentials: [{ name: 'Robotics and Controls Job Simulation', url: 'https://www.theforage.com/completion-certificates/3w79S9RRBtn9noDWZ/q8m3gpN4ETXnjapPq_3w79S9RRBtn9noDWZ_68cb1c8d15c59647ef0fd6d3_1758866617136_completion_certificate.pdf' }] },
-                    { company: 'Lloyds Banking Group', logo: 'https://cdn.brandfetch.io/idGB0ZmIES/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1682688649936', credentials: [{ name: 'Data Science Job Simulation', url: 'https://www.theforage.com/completion-certificates/Zbnc2o4ok6kD2NEXx/EuvC8GPjkZ6xaiP9p_Zbnc2o4ok6kD2NEXx_68cb1c8d15c59647ef0fd6d3_1758779762939_completion_certificate.pdf' }] },
-                    { company: 'Deloitte', logo: 'https://cdn.brandfetch.io/idIu-Ji9Le/w/320/h/320/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1670911863379', credentials: [{ name: 'Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/9PBTqmSxAf6zZTseP/io9DzWKe3PTsiS6GG_9PBTqmSxAf6zZTseP_68cb1c8d15c59647ef0fd6d3_1758809029968_completion_certificate.pdf' }] },
-                    { company: 'Mastercard', logo: 'https://cdn.brandfetch.io/idFw8DodCr/theme/dark/symbol.svg?c=1bxid64Mup7aczewSAYMX&t=1721117489739', credentials: [{ name: 'Cybersecurity Job Simulation', url: 'https://www.theforage.com/completion-certificates/mfxGwGDp6WkQmtmTf/vcKAB5yYAgvemepGQ_mfxGwGDp6WkQmtmTf_68cb1c8d15c59647ef0fd6d3_1758712489219_completion_certificate.pdf' }] },
-                    { company: 'Electronic Arts', logo: 'https://cdn.brandfetch.io/idT4nN4-os/theme/dark/idGewYlRz-.svg?c=1bxid64Mup7aczewSAYMX&t=1758357511674', credentials: [{ name: 'Software Engineering Job Simulation', url: 'https://www.theforage.com/completion-certificates/j43dGscQHtJJ57N54/a77WE3de8qrxWferQ_j43dGscQHtJJ57N54_68cb1c8d15c59647ef0fd6d3_1758695096188_completion_certificate.pdf' }] },
-                    { company: 'Quantium', logo: 'https://cdn.brandfetch.io/idKz2rVWH7/w/200/h/200/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1671600668132', credentials: [{ name: 'Data Analytics Job Simulation', url: 'https://www.theforage.com/completion-certificates/32A6DqtsbF7LbKdcq/NkaC7knWtjSbi6aYv_32A6DqtsbF7LbKdcq_68cb1c8d15c59647ef0fd6d3_1758805395283_completion_certificate.pdf' }] },
-                    { company: 'Forage', logo: 'https://cdn.brandfetch.io/idV710Mm_L/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1758723297034', credentials: [{ name: 'Branding & Design Job Simulation', url: 'https://www.theforage.com/completion-certificates/HgpPSsyQpzob6HEh9/GEZvgDCZaMT3rqfRr_HgpPSsyQpzob6HEh9_68cb1c8d15c59647ef0fd6d3_1758706723589_completion_certificate.pdf' }] },
-                    { company: 'Asterisc-python3', logo: 'https://ugc.production.linktr.ee/FkqHcdwPRbiztlCxKyeF_geigtpU4I3u590QN?io=true&size=avatar-v3_0', credentials: [{ name: 'Python-3 Programming', url: 'https://drive.google.com/file/d/169OETqm19aT5-wTkfsaMtckLV9ipf5w4/view?usp=sharing' }] },
-                    { company: 'EAB', logo: 'https://cdn.brandfetch.io/idivkYLQU6/w/400/h/400/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1751876733701', credentials: [{ name: 'GenAI for Proposal Generation Job Simulation', url: 'https://www.theforage.com/completion-certificates/PSJm5xBFZtjjf9AnA/i2nMh36aEWT7awGCa_PSJm5xBFZtjjf9AnA_68cb1c8d15c59647ef0fd6d3_1758860940395_completion_certificate.pdf' }] },
-                    { company: 'Datacom', logo: 'https://cdn.brandfetch.io/idLi03Oj_s/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1695336646053', credentials: [{ name: 'Automation Job Simulation', url: 'https://www.theforage.com/completion-certificates/gCW7Xki5Y3vNpBmnn/Nw3MzxF2wjmki7Qor_gCW7Xki5Y3vNpBmnn_68cb1c8d15c59647ef0fd6d3_1758858217488_completion_certificate.pdf' }] },
+                    {
+                        company: 'Google', logo: 'https://www.vectorlogo.zone/logos/google/google-icon.svg',
+                        credentials: [{
+                            name: 'Advanced Data Analytics Professional',
+                            url: 'https://www.coursera.org/account/accomplishments/professional-cert/2F66GDKEUNLK'
+                        }]
+                    },
+                    {
+                        company: 'DeepLearning.AI', logo: 'https://cdn.brandfetch.io/idcuOol42D/theme/dark/symbol.svg?c=1bxid64Mup7aczewSAYMX&t=1668081047590',
+                        credentials: [{
+                            name: 'TensorFlow Developer Professional',
+                            url: 'https://www.coursera.org/account/accomplishments/professional-cert/PAUSSXCRK9YL'
+                        }]
+                    },
+                    {
+                        company: 'Microsoft', logo: 'https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg',
+                        credentials: [{
+                            name: 'Microsoft 365 Fundamentals',
+                            url: 'https://www.coursera.org/account/accomplishments/specialization/2EUL5E7W7JNU'
+                        }]
+                    },
+                    {
+                        company: 'J.P. Morgan', logo: 'https://cdn.brandfetch.io/idB8rdGiLv/w/200/h/200/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1727703975236',
+                        credentials: [{
+                            name: 'Quantitative Research Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/Sj7temL583QAYpHXD/bWqaecPDbYAwSDqJy_Sj7temL583QAYpHXD_68cb1c8d15c59647ef0fd6d3_1758767942630_completion_certificate.pdf'
+                        }, {
+                            name: 'Software Engineering Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/Sj7temL583QAYpHXD/E6McHJDKsQYh79moz_Sj7temL583QAYpHXD_68cb1c8d15c59647ef0fd6d3_1758692204442_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'Tata', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Tata_logo.svg',
+                        credentials: [{
+                            name: 'Cybersecurity Analyst Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gmf3ypEXBj2wvfQWC_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758714476711_completion_certificate.pdf'
+                        }, {
+                            name: 'Data Visualisation Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/MyXvBcppsW2FkNYCX_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758777844048_completion_certificate.pdf'
+                        }, {
+                            name: 'GenAI Powered Data Analytics Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/ifobHAoMjQs9s6bKS/gMTdCXwDdLYoXZ3wG_ifobHAoMjQs9s6bKS_68cb1c8d15c59647ef0fd6d3_1758863812597_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'BCG', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/BCG_Corporate_Logo.svg',
+                        credentials: [{
+                            name: 'Data Science Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/SKZxezskWgmFjRvj9/Tcz8gTtprzAS4xSoK_SKZxezskWgmFjRvj9_68cb1c8d15c59647ef0fd6d3_1758857325840_completion_certificate.pdf'
+                        }, {
+                            name: 'GenAI Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/SKZxezskWgmFjRvj9/gabev3vXhuACr48eb_SKZxezskWgmFjRvj9_68cb1c8d15c59647ef0fd6d3_1758884088047_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'Walmart', logo: 'https://www.vectorlogo.zone/logos/walmart/walmart-icon.svg',
+                        credentials: [{
+                            name: 'Advanced Software Engineering Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/prBZoAihniNijyD6d/oX6f9BbCL9kJDJzfg_prBZoAihniNijyD6d_68cb1c8d15c59647ef0fd6d3_1758710338762_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'Johnson&Johnson', logo: 'https://cdn.brandfetch.io/idBwyRkMdk/w/400/h/400/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1721633464973',
+                        credentials: [{
+                            name: 'Robotics and Controls Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/3w79S9RRBtn9noDWZ/q8m3gpN4ETXnjapPq_3w79S9RRBtn9noDWZ_68cb1c8d15c59647ef0fd6d3_1758866617136_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'Lloyds Banking Group', logo: 'https://cdn.brandfetch.io/idGB0ZmIES/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1682688649936',
+                        credentials: [{
+                            name: 'Data Science Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/Zbnc2o4ok6kD2NEXx/EuvC8GPjkZ6xaiP9p_Zbnc2o4ok6kD2NEXx_68cb1c8d15c59647ef0fd6d3_1758779762939_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'Oracle', logo: 'https://cdn.brandfetch.io/idnq7H7qT0/w/400/h/400/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1667576597154',
+                        credentials: [{
+                            name: 'AI Foundations Associate',
+                            url: 'https://catalog-education.oracle.com/ords/certview/sharebadge?id=9410B571E720EB6ADCC58BF5A66DBC9894ED23337E54B6AD70EF267AF3506F1D'
+                        }, {
+                            name: 'AI Vector Search',
+                            url: 'https://catalog-education.oracle.com/ords/certview/sharebadge?id=7CB8DCCE8701A47F681D7DE66654F36F4E69692DB2F4D786E7A13B8857D6071D'
+                        }, {
+                            name: 'Data Science Professional',
+                            url: 'https://catalog-education.oracle.com/ords/certview/sharebadge?id=5B1B4F03A9B25BA798C70890B9075F742245A24319C6FDFE18B5519BC8729B2A'
+                        }, {
+                            name: 'Fusion AI Agent Studio',
+                            url: 'https://catalog-education.oracle.com/ords/certview/sharebadge?id=D9709CE92E56C54CA180ADB432AC0CC41360910A78E8485A43FC5F26FDD48D1D'
+                        }, {
+                            name: 'DevOps Professional',
+                            url: 'https://catalog-education.oracle.com/pls/certview/sharebadge?id=2E286561D7EC64B78CAAB968B788C2C1D7505DC5FE8ACBAFEFEE137693F27DD7'
+                        }, {
+                            name: 'Generative AI Professional',
+                            url: 'https://catalog-education.oracle.com/ords/certview/sharebadge?id=567771801D4133CA4A80FF57C2F90A2677D646560A9AC9AE711BF27BE34844C2'
+                        }]
+                    },
+                    {
+                        company: 'Deloitte', logo: 'https://cdn.brandfetch.io/idIu-Ji9Le/w/320/h/320/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1670911863379', credentials: [{
+                            name: 'Data Analytics Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/9PBTqmSxAf6zZTseP/io9DzWKe3PTsiS6GG_9PBTqmSxAf6zZTseP_68cb1c8d15c59647ef0fd6d3_1758809029968_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'Mastercard', logo: 'https://cdn.brandfetch.io/idFw8DodCr/theme/dark/symbol.svg?c=1bxid64Mup7aczewSAYMX&t=1721117489739',
+                        credentials: [{
+                            name: 'Cybersecurity Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/mfxGwGDp6WkQmtmTf/vcKAB5yYAgvemepGQ_mfxGwGDp6WkQmtmTf_68cb1c8d15c59647ef0fd6d3_1758712489219_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'Electronic Arts', logo: 'https://cdn.brandfetch.io/idT4nN4-os/theme/dark/idGewYlRz-.svg?c=1bxid64Mup7aczewSAYMX&t=1758357511674',
+                        credentials: [{
+                            name: 'Software Engineering Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/j43dGscQHtJJ57N54/a77WE3de8qrxWferQ_j43dGscQHtJJ57N54_68cb1c8d15c59647ef0fd6d3_1758695096188_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'Quantium', logo: 'https://cdn.brandfetch.io/idKz2rVWH7/w/200/h/200/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1671600668132',
+                        credentials: [{
+                            name: 'Data Analytics Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/32A6DqtsbF7LbKdcq/NkaC7knWtjSbi6aYv_32A6DqtsbF7LbKdcq_68cb1c8d15c59647ef0fd6d3_1758805395283_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'Forage', logo: 'https://cdn.brandfetch.io/idV710Mm_L/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1758723297034',
+                        credentials: [{
+                            name: 'Branding & Design Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/HgpPSsyQpzob6HEh9/GEZvgDCZaMT3rqfRr_HgpPSsyQpzob6HEh9_68cb1c8d15c59647ef0fd6d3_1758706723589_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'Asterisc-python3', logo: 'https://ugc.production.linktr.ee/FkqHcdwPRbiztlCxKyeF_geigtpU4I3u590QN?io=true&size=avatar-v3_0',
+                        credentials: [{
+                            name: 'Python-3 Programming',
+                            url: 'https://drive.google.com/file/d/169OETqm19aT5-wTkfsaMtckLV9ipf5w4/view?usp=sharing'
+                        }]
+                    },
+                    {
+                        company: 'EAB', logo: 'https://cdn.brandfetch.io/idivkYLQU6/w/400/h/400/theme/dark/icon.png?c=1bxid64Mup7aczewSAYMX&t=1751876733701',
+                        credentials: [{
+                            name: 'GenAI for Proposal Generation Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/PSJm5xBFZtjjf9AnA/i2nMh36aEWT7awGCa_PSJm5xBFZtjjf9AnA_68cb1c8d15c59647ef0fd6d3_1758860940395_completion_certificate.pdf'
+                        }]
+                    },
+                    {
+                        company: 'Datacom', logo: 'https://cdn.brandfetch.io/idLi03Oj_s/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1695336646053',
+                        credentials: [{
+                            name: 'Automation Job Simulation',
+                            url: 'https://www.theforage.com/completion-certificates/gCW7Xki5Y3vNpBmnn/Nw3MzxF2wjmki7Qor_gCW7Xki5Y3vNpBmnn_68cb1c8d15c59647ef0fd6d3_1758858217488_completion_certificate.pdf'
+                        }]
+                    },
                 ]
             };
 
@@ -2788,6 +2959,3 @@
 </body>
 
 </html>
-
-
-
