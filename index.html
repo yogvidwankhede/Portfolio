@@ -2844,7 +2844,7 @@
             };
 
             const getGeminiResponse = async (userInput) => {
-                const apiKey = ${{Gemini_API}};
+                const apiKey = ${{secrets.Gemini_API}};
                 if (!apiKey) {
                     return "I'm sorry, but my connection isn't configured. The developer needs to add an API key.";
                 }
@@ -3188,4 +3188,5 @@
 </body>
 
 </html>
+
 
