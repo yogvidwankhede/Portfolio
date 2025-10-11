@@ -72,7 +72,8 @@
 
         #skills-title,
         #projects-title,
-        #certifications-title {
+        #certifications-title,
+        #live-projects-title {
             font-family: 'Limelight', cursive;
         }
 
@@ -458,6 +459,95 @@
 
         .certificate-list li a:hover {
             background-color: rgba(51, 102, 153, 0.5);
+        }
+
+        /* --- LIVE PROJECTS STYLES --- */
+        #live-projects {
+            background-color: #1a1a1a;
+        }
+
+        body.light #live-projects {
+            background-color: #f0f2f5;
+        }
+
+        .live-project-card {
+            background: #2a2a30;
+            border: 1px solid #4a4a52;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        body.light .live-project-card {
+            background: #ffffff;
+            border-color: #d1d5db;
+        }
+
+        .live-project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .live-project-card .details {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(51, 102, 153, 0.95);
+            color: white;
+            padding: 1.5rem;
+            transform: translateY(101%);
+            transition: transform 0.4s ease-in-out;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        body.light .live-project-card .details {
+            background: rgba(240, 242, 245, 0.98);
+            color: #1a1a1a;
+        }
+
+        .live-project-card:hover .details {
+            transform: translateY(0);
+        }
+
+        .live-project-links {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1.25rem;
+            align-items: center;
+        }
+
+        .project-link-icon {
+            color: white;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        body.light .project-link-icon {
+            color: #1a1a1a;
+        }
+
+        .project-link-icon:hover {
+            color: #f0f0f0;
+            transform: scale(1.15);
+        }
+
+        body.light .project-link-icon:hover {
+            color: #336699;
+        }
+
+        .project-link-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
         }
 
         /* --- END OF STYLES --- */
@@ -980,6 +1070,15 @@
                         d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                 </svg>
             </a>
+            <a href="#live-projects" id="live-projects-link-header"
+                class="text-gray-300 hover:text-white transition-colors" aria-label="Live Projects"
+                title="Live Projects">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                        clip-rule="evenodd"></path>
+                </svg>
+            </a>
             <a href="#contact" id="contact-link-header"
                 class="bg-[#336699] text-white px-4 py-2 rounded-full bg-opacity-40 transition text-sm font-medium">Contact</a>
         </nav>
@@ -1057,6 +1156,17 @@
                 </div>
             </div>
         </section>
+
+        <!-- === LIVE PROJECTS SECTION === -->
+        <section id="live-projects" class="w-full py-20 px-4 md:px-8">
+            <div class="max-w-6xl mx-auto">
+                <h2 id="live-projects-title" class="text-5xl text-center mb-16">Live Projects</h2>
+                <div id="live-projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Project cards will be injected here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
 
         <!-- SEPARATOR -->
         <div class="max-w-5xl mx-auto px-4 md:px-8">
@@ -1986,6 +2096,17 @@
                     });
                 });
             }
+            const liveProjectsLinkHeader = document.getElementById('live-projects-link-header');
+            if (liveProjectsLinkHeader) {
+                liveProjectsLinkHeader.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    gsap.to(window, {
+                        scrollTo: { y: "#live-projects", autoKill: false, offsetY: 100 },
+                        duration: 1.5,
+                        ease: 'power2.inOut'
+                    });
+                });
+            }
 
             updateVizColors();
             createProjectCards();
@@ -2469,6 +2590,114 @@
                 scrollTrigger: { trigger: "#certification-grid-container", start: "top 85%", toggleActions: "play none none none" },
                 opacity: 0, scale: 0.5, y: 50, duration: 0.5, stagger: 0.1
             });
+            gsap.from("#live-projects-title", {
+                scrollTrigger: { trigger: "#live-projects", start: "top 80%", toggleActions: "play none none none" },
+                opacity: 0, y: 50, duration: 0.6
+            });
+            gsap.from(".live-project-card", {
+                scrollTrigger: { trigger: "#live-projects .grid", start: "top 85%", toggleActions: "play none none none" },
+                opacity: 0, scale: 0.9, y: 50, duration: 0.5, stagger: 0.15
+            });
+
+            // Data for Live Projects Section (Easily Editable)
+            const liveProjectsData = [
+                {
+                    icon: '🐚',
+                    title: 'PyShell',
+                    description: 'A feature-rich, POSIX-compatible shell implemented in Python.',
+                    features: [
+                        'Advanced scripting capabilities',
+                        '50+ built-in commands',
+                        'Cross-platform support'
+                    ],
+                    links: [
+                        {
+                            platform: 'GitHub',
+                            url: 'https://github.com/yogvidwankhede/PyShell',
+                            icon: `<svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>`
+                        },
+                        {
+                            platform: 'PyPI',
+                            url: 'https://pypi.org/project/pyshell-terminal/',
+                            icon: `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><path d="M30 60C46.5685 60 60 46.5685 60 30C60 13.4315 46.5685 0 30 0C13.4315 0 0 13.4315 0 30C0 46.5685 13.4315 60 30 60Z" fill="#3775A9"></path><path d="M22.5029 42V15.708H31.5299V19.458H26.2529V27.45H31.0259V31.2H26.2529V38.25H32.0309V42H22.5029Z" fill="white"></path><path d="M41.742 27.645C41.742 29.814 41.139 31.623 39.933 33.072C38.727 34.521 37.077 35.241 34.983 35.241C32.889 35.241 31.239 34.521 30.033 33.072C28.827 31.623 28.224 29.814 28.224 27.645C28.224 25.479 28.827 23.673 30.033 22.224C31.239 20.775 32.889 20.046 34.983 20.046C37.077 20.046 38.727 20.775 39.933 22.224C41.139 23.673 41.742 25.479 41.742 27.645ZM38.019 27.645C38.019 26.295 37.662 25.2 36.948 24.36C36.234 23.52 35.253 23.094 34.005 23.094C32.757 23.094 31.779 23.52 31.065 24.36C30.351 25.2 30.003 26.295 30.003 27.645C30.003 29.013 30.351 30.108 31.065 30.948C31.779 31.788 32.757 32.208 34.005 32.208C35.253 32.208 36.234 31.788 36.948 30.948C37.662 30.108 38.019 29.013 38.019 27.645Z" fill="#FFD43B"></path></svg>`
+                        }
+                    ]
+                },
+                {
+                    icon: '🔍',
+                    title: 'PyGrep',
+                    description: 'A powerful VS Code extension for advanced text search.',
+                    features: [
+                        'Python-like regular expressions',
+                        'Real-time search preview',
+                        'Multi-file support'
+                    ],
+                    links: [
+                        {
+                            platform: 'GitHub',
+                            url: 'https://github.com/yogvidwankhede/PyGrep',
+                            icon: `<svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>`
+                        },
+                        {
+                            platform: 'VS Marketplace',
+                            url: 'https://marketplace.visualstudio.com/items?itemName=yogvid.pygrep',
+                            icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22.2,8.4l-1.4-3.9L12,7.3V18l8.2,4.2V8.4z M1.8,8.4v8.2L12,22.2V7.3L1.8,8.4z M12,1.8L1.8,7.3v0.1l10.2,4.8l10.2-4.8V7.3 L12,1.8z" /></svg>`
+                        }
+                    ]
+                },
+                {
+                    icon: '🛠️',
+                    title: 'Developer Tools',
+                    description: 'A collection of open-source developer utilities and projects.',
+                    features: [
+                        'Scripts for automation',
+                        'Small applications and libraries',
+                        'Tools to improve workflows'
+                    ],
+                    links: [
+                        {
+                            platform: 'GitHub',
+                            url: 'https://github.com/yogvidwankhede/Developer-Tools',
+                            icon: `<svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>`
+                        }
+                    ]
+                }
+            ];
+
+            function generateLiveProjectCards() {
+                const grid = document.getElementById('live-projects-grid');
+                if (!grid) return;
+
+                liveProjectsData.forEach(project => {
+                    const card = document.createElement('div');
+                    card.className = 'live-project-card';
+
+                    const linksHTML = project.links.map(link => `
+                <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="project-link-icon" title="${link.platform}">
+                    ${link.icon}
+                </a>
+            `).join('');
+
+                    card.innerHTML = `
+                <div class="content">
+                    <h3 class="text-2xl font-bold text-[#336699] mb-2">${project.icon} ${project.title}</h3>
+                    <p class="text-gray-400 min-h-[40px]">${project.description}</p>
+                </div>
+                <div class="details">
+                    <h4 class="font-bold mb-2">Key Features:</h4>
+                    <ul class="list-disc list-inside text-sm space-y-1">
+                        ${project.features.map(f => `<li>${f}</li>`).join('')}
+                    </ul>
+                    <div class="live-project-links">
+                        ${linksHTML}
+                    </div>
+                </div>
+            `;
+                    grid.appendChild(card);
+                });
+            }
+
+            generateLiveProjectCards();
 
             const thumb = document.getElementById('custom-scrollbar-thumb');
             const track = document.getElementById('custom-scrollbar-track');
